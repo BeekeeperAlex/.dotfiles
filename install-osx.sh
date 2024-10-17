@@ -59,7 +59,7 @@ brew install \
 	powerlevel10k \
 	python \
 	ripgrep \
-	rust \
+	rustup \
 	rust-analyzer \
 	thefuck \
 	tlrc \

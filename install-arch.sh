@@ -49,7 +49,7 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	python-pip \
 	python-setuptools \
 	ripgrep \
-	rust \
+	rustup \
 	rust-analyzer \
 	thefuck \
 	tlrc-bin \

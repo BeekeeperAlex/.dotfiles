@@ -93,7 +93,7 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 
 # If running in wezterm, source the shell integration script.
 [[ "$TERM" = "wezterm" ]] && source "$HOME/.dotfiles/wezterm-shell-integration.sh"
-command -v direnv &> /dev/null && eval "$(direnv hook zsh)"
+# command -v direnv &> /dev/null && eval "$(direnv hook zsh)"
 
 # If gh-copilot is installed then configure its default aliases.
 # ghcs - Github Copilot Suggest

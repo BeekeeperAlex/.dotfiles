@@ -52,9 +52,9 @@ updoot() {
 }
 
 # Check if we should run system updates.
-# if check_last_run; then
-# 	updoot
-# fi
+if check_last_run; then
+	updoot
+fi
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -91,9 +91,7 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 # typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND="#FF6AC1"
 # typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND="#FF5c57"
 
-# If running in wezterm, source the shell integration script.
-[[ "$TERM" = "wezterm" ]] && source "$HOME/.dotfiles/wezterm-shell-integration.sh"
-# command -v direnv &> /dev/null && eval "$(direnv hook zsh)"
+command -v direnv &> /dev/null && eval "$(direnv hook zsh)"
 
 # If gh-copilot is installed then configure its default aliases.
 # ghcs - Github Copilot Suggest
@@ -183,14 +181,3 @@ alias vi="nvim"
 alias vim="nvim"
 alias cd="z"
 alias ff="fastfetch"
-
-export KOMOREBI=false
-function komo() {
-	if [[ $KOMOREBI == true ]]; then
-		komorebic.exe stop --whkd
-		KOMOREBI=false
-	elif [[ $KOMOREBI == false ]]; then
-		komorebic.exe start --whkd
-		KOMOREBI=true
-	fi
-}

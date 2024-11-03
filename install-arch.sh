@@ -54,7 +54,6 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	thefuck \
 	tlrc-bin \
 	unzip \
-	wezterm \
 	zsh \
 	bun-bin \
 	neovim-nightly-bin \

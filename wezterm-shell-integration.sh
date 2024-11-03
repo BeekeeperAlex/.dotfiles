@@ -15,12 +15,12 @@
 #                                about running programs
 
 # shellcheck disable=SC2166
-if [ -z "${BASH_VERSION}" -a -z "${ZSH_NAME}" ]; then
+if [ -z "${BASH_VERSION-}" -a -z "${ZSH_NAME-}" ]; then
 	# Only for bash or zsh
 	return 0
 fi
 
-if [ "${WEZTERM_SHELL_SKIP_ALL}" = "1" ]; then
+if [ "${WEZTERM_SHELL_SKIP_ALL-}" = "1" ]; then
 	return 0
 fi
 
@@ -423,7 +423,7 @@ __wezterm_install_bash_prexec() {
 
 # blesh provides it's own preexec mechanism which is recommended over bash-preexec
 # See https://github.com/akinomyoga/ble.sh/wiki/Manual-%C2%A71-Introduction#user-content-fn-blehook for more details
-if [[ ! -n "$BLE_VERSION" ]]; then
+if [[ ! -n "${BLE_VERSION-}" ]]; then
 	__wezterm_install_bash_prexec
 fi
 
@@ -432,7 +432,7 @@ fi
 # It requires the `base64` utility to be available in the path.
 __wezterm_set_user_var() {
 	if hash base64 2>/dev/null; then
-		if [[ -z "${TMUX}" ]]; then
+		if [[ -z "${TMUX-}" ]]; then
 			printf "\033]1337;SetUserVar=%s=%s\007" "$1" $(echo -n "$2" | base64)
 		else
 			# <https://github.com/tmux/tmux/wiki/FAQ#what-is-the-passthrough-escape-sequence-and-how-do-i-use-it>
@@ -484,9 +484,12 @@ __wezterm_semantic_precmd() {
 }
 
 function __wezterm_semantic_preexec() {
-	# Restore the original PS1/PS2
-	PS1="$__wezterm_save_ps1"
-	PS2="$__wezterm_save_ps2"
+	# Restore the original PS1/PS2 if set
+	if [ -n "${__wezterm_save_ps1+1}" ]; then
+		PS1="$__wezterm_save_ps1"
+		PS2="$__wezterm_save_ps2"
+		unset __wezterm_save_ps1
+	fi
 	# Indicate that the command output begins here
 	printf "\033]133;C;\007"
 	__wezterm_semantic_precmd_executing=1
@@ -497,7 +500,7 @@ __wezterm_user_vars_precmd() {
 	__wezterm_set_user_var "WEZTERM_USER" "$(id -un)"
 
 	# Indicate whether this pane is running inside tmux or not
-	if [[ -n "${TMUX}" ]]; then
+	if [[ -n "${TMUX-}" ]]; then
 		__wezterm_set_user_var "WEZTERM_IN_TMUX" "1"
 	else
 		__wezterm_set_user_var "WEZTERM_IN_TMUX" "0"
@@ -524,8 +527,8 @@ __wezterm_user_vars_preexec() {
 # Register the various functions; take care to perform osc7 after
 # the semantic zones as we don't want to perturb the last command
 # status before we've had a chance to report it to the terminal
-if [[ -z "${WEZTERM_SHELL_SKIP_SEMANTIC_ZONES}" ]]; then
-	if [[ -n "$BLE_VERSION" ]]; then
+if [[ -z "${WEZTERM_SHELL_SKIP_SEMANTIC_ZONES-}" ]]; then
+	if [[ -n "${BLE_VERSION-}" ]]; then
 		blehook PRECMD+=__wezterm_semantic_precmd
 		blehook PREEXEC+=__wezterm_semantic_preexec
 	else
@@ -534,8 +537,8 @@ if [[ -z "${WEZTERM_SHELL_SKIP_SEMANTIC_ZONES}" ]]; then
 	fi
 fi
 
-if [[ -z "${WEZTERM_SHELL_SKIP_USER_VARS}" ]]; then
-	if [[ -n "$BLE_VERSION" ]]; then
+if [[ -z "${WEZTERM_SHELL_SKIP_USER_VARS-}" ]]; then
+	if [[ -n "${BLE_VERSION-}" ]]; then
 		blehook PRECMD+=__wezterm_user_vars_precmd
 		blehook PREEXEC+=__wezterm_user_vars_preexec
 	else
@@ -544,8 +547,8 @@ if [[ -z "${WEZTERM_SHELL_SKIP_USER_VARS}" ]]; then
 	fi
 fi
 
-if [[ -z "${WEZTERM_SHELL_SKIP_CWD}" ]]; then
-	if [[ -n "$BLE_VERSION" ]]; then
+if [[ -z "${WEZTERM_SHELL_SKIP_CWD-}" ]]; then
+	if [[ -n "${BLE_VERSION-}" ]]; then
 		blehook PRECMD+=__wezterm_osc7
 	else
 		precmd_functions+=(__wezterm_osc7)

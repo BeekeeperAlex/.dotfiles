@@ -36,8 +36,6 @@ RUN ./install-arch.sh
 # Set user-specific environment variables.
 ENV SHELL=/bin/zsh
 ENV TERM=xterm-256color
-# Needed to prevent Wezterm from trying to integrate with systemd within the container.
-ENV WEZTERM_SHELL_SKIP_ALL=1
 
 # Start Zsh login session by default.
 CMD ["zsh", "-l"]

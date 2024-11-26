@@ -56,6 +56,29 @@ if wezterm.target_triple:match("windows") then
 	config.default_domain = "WSL:Arch"
 	config.default_cwd = "/home/catdad"
 	config.win32_system_backdrop = "Disable" -- ["Auto", "Acrylic", "Mica", "Tabbed" "Disable"]
+	config.background = {
+		{
+			source = {
+				File = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\catbg.png",
+			},
+			opacity = 1,
+			attachment = "Fixed",
+			repeat_x = "NoRepeat",
+			repeat_y = "NoRepeat",
+			vertical_align = "Bottom",
+			horizontal_align = "Center",
+			height = "Cover",
+			width = "Cover",
+		},
+		{
+			source = {
+				Color = "#000000",
+			},
+			opacity = 0.85,
+			width = "100%",
+			height = "100%",
+		},
+	}
 elseif wezterm.target_triple:match("darwin") then
 	-- OSX Does not like to show desktop backgorund behind fullscreen apps.
 	-- Set a Wezterm background image instead.

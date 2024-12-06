@@ -6,14 +6,19 @@ require("mousemaps")
 local wezterm = require("wezterm")
 local config = require("config")
 
+local color_schemes = wezterm.get_builtin_color_schemes()
+for k, v in pairs(config.color_schemes) do
+	color_schemes[k] = v
+end
+
 -- config.color_scheme = "Tokyo Night Storm"
--- config.color_scheme = "Tokyo Night Moon"
-config.color_scheme = "Tokyo Night"
+config.color_scheme = "Tokyo Night Moon"
+-- config.color_scheme = "Tokyo Night"
 -- config.color_scheme = "Catppuccin Frappe"
 -- config.color_scheme = "Catppuccin Macchiato"
 -- config.color_scheme = "Catppuccin Mocha"
 -- config.color_scheme = "Catppuccin Pink Mocha"
--- config.color_scheme = "Gruvbox Dark Hard"
+-- config.color_scheme = "GruvboxDarkHard"
 
 config.font_size = 14
 config.font = wezterm.font_with_fallback({
@@ -52,59 +57,38 @@ config.window_close_confirmation = "NeverPrompt"
 config.window_decorations = "RESIZE" --"INTEGRATED_BUTTONS|RESIZE"
 config.window_padding = { left = 10, right = 10, top = 25, bottom = 10 }
 
+local bgpath = "~/.dotfiles/catbg.png"
 if wezterm.target_triple:match("windows") then
 	config.default_domain = "WSL:Arch"
 	config.default_cwd = "/home/catdad"
 	config.win32_system_backdrop = "Disable" -- ["Auto", "Acrylic", "Mica", "Tabbed" "Disable"]
-	config.background = {
-		{
-			source = {
-				File = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\catbg.png",
-			},
-			opacity = 1,
-			attachment = "Fixed",
-			repeat_x = "NoRepeat",
-			repeat_y = "NoRepeat",
-			vertical_align = "Bottom",
-			horizontal_align = "Center",
-			height = "Cover",
-			width = "Cover",
-		},
-		{
-			source = {
-				Color = "#000000",
-			},
-			opacity = 0.85,
-			width = "100%",
-			height = "100%",
-		},
-	}
+	bgpath = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\catbg.png"
 elseif wezterm.target_triple:match("darwin") then
-	-- OSX Does not like to show desktop backgorund behind fullscreen apps.
-	-- Set a Wezterm background image instead.
-	config.background = {
-		{
-			source = {
-				File = "/Users/alexford/.dotfiles/images/catbg.png",
-			},
-			opacity = 1,
-			attachment = "Fixed",
-			repeat_x = "NoRepeat",
-			repeat_y = "NoRepeat",
-			vertical_align = "Bottom",
-			horizontal_align = "Center",
-			height = "Cover",
-			width = "Cover",
-		},
-		{
-			source = {
-				Color = "#000000",
-			},
-			opacity = 0.85,
-			width = "100%",
-			height = "100%",
-		},
-	}
+	bgpath = "/Users/alexford/.dotfiles/images/catbg.png"
 end
+
+config.background = {
+	{
+		source = {
+			File = bgpath,
+		},
+		opacity = 1,
+		attachment = "Fixed",
+		repeat_x = "NoRepeat",
+		repeat_y = "NoRepeat",
+		vertical_align = "Bottom",
+		horizontal_align = "Center",
+		height = "Cover",
+		width = "Cover",
+	},
+	{
+		source = {
+			Color = color_schemes[config.color_scheme].background,
+		},
+		opacity = 0.9,
+		width = "100%",
+		height = "100%",
+	},
+}
 
 return config

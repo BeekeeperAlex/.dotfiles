@@ -3,12 +3,11 @@ return {
 	{
 		"catppuccin/nvim",
 		lazy = false,
-		priority = 10000,
 		name = "catppuccin",
 		opts = {
 			-- flavour = "frappe",
-			flavour = "macchiato",
-			-- flavour = "mocha",
+			-- flavour = "macchiato",
+			flavour = "mocha",
 			transparent_background = true,
 			-- color_overrides = {
 			-- 	mocha = {
@@ -31,17 +30,15 @@ return {
 	{
 		"ellisonleao/gruvbox.nvim",
 		lazy = false,
-		priority = 10000,
 		opts = { contrast = "hard", transparent_mode = true },
 	},
 	{
 		"folke/tokyonight.nvim",
 		lazy = false,
-		priority = 10000,
 		opts = {
 			-- style = "storm",
-			-- style = "moon",
-			style = "night",
+			style = "moon",
+			-- style = "night",
 			transparent = true,
 		},
 	},

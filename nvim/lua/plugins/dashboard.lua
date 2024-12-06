@@ -10,25 +10,19 @@ return {
 		local function pickLogo()
 			local filepath = vim.fn.getcwd() or ""
 			local hostname = vim.fn.hostname() or ""
-			if string.match(filepath .. hostname, "limble") then
-				return [[
-██╗     ██╗███╗   ███╗██████╗ ██╗     ███████╗
-██║     ██║████╗ ████║██╔══██╗██║     ██╔════╝
-██║     ██║██╔████╔██║██████╔╝██║     █████╗  
-██║     ██║██║╚██╔╝██║██╔══██╗██║     ██╔══╝  
-███████╗██║██║ ╚═╝ ██║██████╔╝███████╗███████╗
-╚══════╝╚═╝╚═╝     ╚═╝╚═════╝ ╚══════╝╚══════╝
-				]]
-			else
-				return [[
+			-- if string.match(filepath .. hostname, "") then
+			-- 	return [[
+			-- 	]]
+			-- else
+			return [[
  ██████╗██╗  ██╗███████╗██╗   ██╗
 ██╔════╝██║  ██║██╔════╝██║   ██║
 ██║     ███████║█████╗  ██║   ██║
 ██║     ██╔══██║██╔══╝  ╚██╗ ██╔╝
 ╚██████╗██║  ██║███████╗ ╚████╔╝ 
  ╚═════╝╚═╝  ╚═╝╚══════╝  ╚═══╝  
-				]]
-			end
+			]]
+			-- end
 		end
 
 		-- Retrieve relevant logo and set it as dashboard header.

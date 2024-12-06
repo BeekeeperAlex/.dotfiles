@@ -7,6 +7,7 @@ return {
 				disabled_filetypes = {
 					"lazyterm",
 					"dashboard",
+					"snacks_dashboard",
 				},
 				component_separators = {
 					left = "",

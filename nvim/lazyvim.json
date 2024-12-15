@@ -9,7 +9,6 @@
     "lazyvim.plugins.extras.dap.core",
     "lazyvim.plugins.extras.dap.nlua",
     "lazyvim.plugins.extras.editor.dial",
-    "lazyvim.plugins.extras.editor.fzf",
     "lazyvim.plugins.extras.editor.inc-rename",
     "lazyvim.plugins.extras.editor.mini-files",
     "lazyvim.plugins.extras.editor.overseer",
@@ -49,7 +48,7 @@
     "lazyvim.plugins.extras.util.rest"
   ],
   "news": {
-    "NEWS.md": "7429",
+    "NEWS.md": "10960",
     "doc/news.txt": "2502"
   },
   "version": 7

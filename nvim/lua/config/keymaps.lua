@@ -3,6 +3,6 @@
 -- Add any additional keymaps here
 
 -- Toggle center scrolling.
-vim.keymap.set("n", "<leader>uS", function()
-	vim.opt.scrolloff = 999 - vim.o.scrolloff
-end, { desc = "Toggle Center Scrolling" })
+-- vim.keymap.set("n", "<leader>uS", function()
+-- 	vim.opt.scrolloff = 999 - vim.o.scrolloff
+-- end, { desc = "Toggle Center Scrolling" })

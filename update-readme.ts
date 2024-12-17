@@ -30,7 +30,7 @@ const gitRemotes = (
 
 const pluginList = gitRemotes.map(({ name, url }) => `- [${name}](${url})`);
 
-const readmePath = join(".", "README.md");
+const readmePath = join(process.env.HOME, ".dotfiles", "README.md");
 const readmeContent = await readFile(readmePath, "utf-8");
 const lines = readmeContent.split("\n");
 const pluginsHeaderIndex = lines.findIndex(line => line.match(/^### Neovim Plugins/));

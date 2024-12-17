@@ -4,11 +4,11 @@ return {
 	opts = function(_, opts)
 		return vim.tbl_deep_extend("force", opts, {
 			options = {
-				disabled_filetypes = {
-					"lazyterm",
-					"dashboard",
-					"snacks_dashboard",
-				},
+				-- disabled_filetypes = {
+				-- 	"lazyterm",
+				-- 	"dashboard",
+				-- 	"snacks_dashboard",
+				-- },
 				component_separators = {
 					left = "",
 					right = "",
@@ -19,38 +19,38 @@ return {
 				},
 			},
 			sections = {
-				lualine_a = {
-					{
-						"mode",
-						-- separator = {
-						-- 	left = "",
-						-- },
-					},
-				},
+				-- lualine_a = {
+				-- 	{
+				-- 		"mode",
+				-- 		separator = {
+				-- 			left = "",
+				-- 		},
+				-- 	},
+				-- },
 				lualine_z = {
 					{
 						"datetime",
-						style = "  %I:%M:%S %p",
+						style = "  %I:%M %p",
 						-- separator = {
 						-- 	right = "",
 						-- },
 					},
 				},
 			},
-			winbar = {
-				lualine_b = {
-					{ "filename", path = 1 },
-				},
-				lualine_c = {
-					{ "filetype" },
-				},
-			},
-			inactive_winbar = {
-				lualine_c = {
-					{ "filename", path = 1 },
-					{ "filetype" },
-				},
-			},
+			-- winbar = {
+			-- 	lualine_b = {
+			-- 		{ "filename", path = 1 },
+			-- 	},
+			-- 	lualine_c = {
+			-- 		{ "filetype" },
+			-- 	},
+			-- },
+			-- inactive_winbar = {
+			-- 	lualine_c = {
+			-- 		{ "filename", path = 1 },
+			-- 		{ "filetype" },
+			-- 	},
+			-- },
 		})
 	end,
 }

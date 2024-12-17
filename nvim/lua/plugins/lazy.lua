@@ -6,7 +6,7 @@ return {
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "LazySync",
 			callback = function()
-				os.execute("bun update-readme.ts")
+				os.execute("bun $HOME/.dotfiles/update-readme.ts")
 			end,
 		})
 	end,

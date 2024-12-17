@@ -12,8 +12,8 @@ for k, v in pairs(config.color_schemes) do
 end
 
 -- config.color_scheme = "Tokyo Night Storm"
-config.color_scheme = "Tokyo Night Moon"
--- config.color_scheme = "Tokyo Night"
+-- config.color_scheme = "Tokyo Night Moon"
+config.color_scheme = "Tokyo Night"
 -- config.color_scheme = "Catppuccin Frappe"
 -- config.color_scheme = "Catppuccin Macchiato"
 -- config.color_scheme = "Catppuccin Mocha"

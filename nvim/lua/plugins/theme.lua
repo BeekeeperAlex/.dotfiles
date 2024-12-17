@@ -37,8 +37,8 @@ return {
 		lazy = false,
 		opts = {
 			-- style = "storm",
-			style = "moon",
-			-- style = "night",
+			-- style = "moon",
+			style = "night",
 			transparent = true,
 		},
 	},

@@ -60,7 +60,6 @@ brew install \
 	python \
 	ripgrep \
 	rustup \
-	rust-analyzer \
 	thefuck \
 	tlrc \
 	volta \

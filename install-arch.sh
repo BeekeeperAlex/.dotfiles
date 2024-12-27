@@ -50,7 +50,6 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	python-setuptools \
 	ripgrep \
 	rustup \
-	rust-analyzer \
 	thefuck \
 	tlrc-bin \
 	unzip \

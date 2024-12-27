@@ -40,7 +40,7 @@ config.enable_wayland = true
 config.exit_behavior_messaging = "Verbose"
 config.front_end = "OpenGL" -- ["OpenGL", "Software", "WebGpu"]
 config.hide_mouse_cursor_when_typing = true
-config.hide_tab_bar_if_only_one_tab = true
+config.hide_tab_bar_if_only_one_tab = false
 -- config.macos_window_background_blur = 0
 config.max_fps = 144
 config.mouse_wheel_scrolls_tabs = false
@@ -54,7 +54,7 @@ config.webgpu_power_preference = "HighPerformance"
 config.webgpu_preferred_adapter = wezterm.gui.enumerate_gpus()[2]
 config.window_background_opacity = 0.9
 config.window_close_confirmation = "NeverPrompt"
-config.window_decorations = "RESIZE" --"INTEGRATED_BUTTONS|RESIZE"
+config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 config.window_padding = { left = 10, right = 10, top = 25, bottom = 10 }
 
 local bgpath = "~/.dotfiles/catbg.png"

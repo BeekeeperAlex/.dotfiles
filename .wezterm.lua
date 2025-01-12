@@ -23,8 +23,8 @@ config.color_scheme = "Tokyo Night"
 config.font_size = 14
 config.font = wezterm.font_with_fallback({
 	-- { family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
-	-- { family = "Cartograph CF", weight = "Bold" },
-	{ family = "ComicShannsMono Nerd Font", weight = "Bold" },
+	{ family = "Cartograph CF", weight = "Bold" },
+	-- { family = "ComicShannsMono Nerd Font", weight = "Bold" },
 	-- { family = "FiraCode Nerd Font", weight = "Bold" },
 	-- { family = "ProggyClean Nerd Font", weight = "Regular" },
 	-- { family = "ShureTechMono Nerd Font", weight = "Regular" },

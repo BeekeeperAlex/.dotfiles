@@ -93,10 +93,6 @@ brew install neovim --HEAD || {
 }
 echo "...done!"
 
-echo "Installing Neovim plugins..."
-nvim --headless "+Lazy! sync" "+sleep 5" +MasonUpdate "+sleep 5" +TSUpdateSync "+sleep 5" +qa
-echo "...done!"
-
 echo "Authorizing ZSH and setting default shell..."
 sudo sh -c "echo $(which zsh) >> /etc/shells"
 sudo chsh -s "$(which zsh)" "$USER"

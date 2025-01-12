@@ -75,11 +75,6 @@ volta install node@latest
 export PATH="$HOME/.volta/bin:$PATH"
 echo "...done!"
 
-# Update neovim plugins.
-echo "Installing Neovim plugins..."
-nvim --headless "+Lazy! sync" "+sleep 5" +MasonUpdate "+sleep 5" +TSUpdateSync "+sleep 5" +qa
-echo "...done!"
-
 # Change user's default shell to ZSH.
 echo "Authorizing ZSH and setting default shell..."
 sudo sh -c "echo $(which zsh) >> /etc/shells"

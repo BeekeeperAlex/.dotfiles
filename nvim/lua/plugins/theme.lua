@@ -42,5 +42,5 @@ return {
 			transparent = true,
 		},
 	},
-	{ "LazyVim/LazyVim", opts = { colorscheme = "tokyonight" } },
+	{ "LazyVim/LazyVim", opts = { colorscheme = "gruvbox" } },
 }

@@ -13,22 +13,22 @@ end
 
 -- config.color_scheme = "Tokyo Night Storm"
 -- config.color_scheme = "Tokyo Night Moon"
-config.color_scheme = "Tokyo Night"
+-- config.color_scheme = "Tokyo Night"
 -- config.color_scheme = "Catppuccin Frappe"
 -- config.color_scheme = "Catppuccin Macchiato"
 -- config.color_scheme = "Catppuccin Mocha"
 -- config.color_scheme = "Catppuccin Pink Mocha"
--- config.color_scheme = "GruvboxDarkHard"
+config.color_scheme = "GruvboxDarkHard"
 
 config.font_size = 14
 config.font = wezterm.font_with_fallback({
 	-- { family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
-	{ family = "Cartograph CF", weight = "Bold" },
+	-- { family = "Cartograph CF", weight = "Regular" },
 	-- { family = "ComicShannsMono Nerd Font", weight = "Bold" },
-	-- { family = "FiraCode Nerd Font", weight = "Bold" },
-	-- { family = "ProggyClean Nerd Font", weight = "Regular" },
-	-- { family = "ShureTechMono Nerd Font", weight = "Regular" },
-	-- { family = "Terminess Nerd Font", weight = "Bold" },
+	-- { family = "Fira Code", weight = "Regular" },
+	-- { family = "ProggyClean Nerd Font", weight = "Bold" },
+	-- { family = "ShureTechMono Nerd Font", weight = "Bold" },
+	{ family = "Terminess Nerd Font", weight = "Regular" },
 	-- { family = "UbuntuMono Nerd Font", weight = "Regular" },
 })
 
@@ -57,12 +57,12 @@ config.window_close_confirmation = "NeverPrompt"
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 config.window_padding = { left = 10, right = 10, top = 25, bottom = 10 }
 
-local bgpath = "~/.dotfiles/catbg.png"
+local bgpath = "~/.dotfiles/wezterm-bg5.png"
 if wezterm.target_triple:match("windows") then
 	config.default_domain = "WSL:Arch"
-	config.default_cwd = "/home/catdad"
+	config.default_cwd = "/home/chev"
 	config.win32_system_backdrop = "Disable" -- ["Auto", "Acrylic", "Mica", "Tabbed" "Disable"]
-	bgpath = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\catbg.png"
+	bgpath = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\wezterm-bg5.png"
 elseif wezterm.target_triple:match("darwin") then
 	bgpath = "/Users/alexford/.dotfiles/images/catbg.png"
 end

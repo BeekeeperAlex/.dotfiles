@@ -13,13 +13,13 @@ vim.opt.scrolloff = 10
 vim.opt.jumpoptions = "stack,view"
 vim.opt.relativenumber = false
 vim.opt.showbreak = "↪ "
-vim.opt.listchars = {
-	tab = " ➞ ",
-	multispace = "·",
-	trail = "·",
-	extends = "»",
-	precedes = "«",
-}
+-- vim.opt.listchars = {
+-- 	tab = " ➞ ",
+-- 	multispace = "·",
+-- 	trail = "·",
+-- 	extends = "»",
+-- 	precedes = "«",
+-- }
 
 vim.opt.guifont = "ComicShannsMono Nerd Font:h12"
 

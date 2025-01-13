@@ -3,6 +3,7 @@
 -- Add any additional options here
 
 vim.g.lazyvim_prettier_needs_config = true
+vim.g.rust_recommended_style = "0"
 
 vim.opt.linebreak = true
 vim.opt.expandtab = false
@@ -13,13 +14,13 @@ vim.opt.scrolloff = 10
 vim.opt.jumpoptions = "stack,view"
 vim.opt.relativenumber = false
 vim.opt.showbreak = "↪ "
--- vim.opt.listchars = {
--- 	tab = " ➞ ",
--- 	multispace = "·",
--- 	trail = "·",
--- 	extends = "»",
--- 	precedes = "«",
--- }
+vim.opt.listchars = {
+	tab = " ➞ ",
+	multispace = "·",
+	trail = "·",
+	extends = "»",
+	precedes = "«",
+}
 
 vim.opt.guifont = "ComicShannsMono Nerd Font:h12"
 

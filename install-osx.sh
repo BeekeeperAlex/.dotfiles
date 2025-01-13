@@ -59,7 +59,6 @@ brew install \
 	powerlevel10k \
 	python \
 	ripgrep \
-	rustup \
 	thefuck \
 	tlrc \
 	volta \
@@ -80,6 +79,9 @@ volta install node@latest
 # Add node to PATH so it can be used by neovim plugins during sync.
 PATH="$HOME/.volta/bin:$PATH"
 echo "...done!"
+
+# Install rust.
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # Install neovim nightly.
 echo "Installing neovim nightly..."

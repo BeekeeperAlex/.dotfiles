@@ -49,7 +49,6 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	python-pip \
 	python-setuptools \
 	ripgrep \
-	rustup \
 	thefuck \
 	tlrc-bin \
 	unzip \
@@ -74,6 +73,9 @@ volta install node@latest
 # Add node to PATH so it can be used by neovim plugins during sync.
 export PATH="$HOME/.volta/bin:$PATH"
 echo "...done!"
+
+# Install rust.
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # Change user's default shell to ZSH.
 echo "Authorizing ZSH and setting default shell..."

@@ -92,13 +92,13 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 # typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND="#FF5c57"
 
 # Generated with `direnv hook zsh`
-command -v direnv &> /dev/null && source ./direnv-hook.zsh
+command -v direnv &> /dev/null && source "$HOME/.dotfiles/direnv-hook.zsh"
 
 # If gh-copilot is installed then configure its default aliases.
 # ghcs - Github Copilot Suggest
 # ghce - Github Copilot Explain
 # Generated with `gh copilot alias -- zsh`
-gh copilot -v &> /dev/null && source ./copilot-aliases.zsh
+gh copilot -v &> /dev/null && source "$HOME/.dotfiles/copilot-aliases.zsh"
 
 # If homebrew is installed then source zsh plugins from their brew locations.
 # Otherwise source from their default locations.
@@ -113,7 +113,7 @@ fi
 # If fzf is installed them pull in its shell completion and key bindings.
 if command -v fzf &> /dev/null ; then
 	# Generated with `fzf --zsh`
-    source ./fzf.zsh
+    source "$HOME/.dotfiles/fzf.zsh"
 	# If fd is also installed then use it as the default fzf functionality.
 	if command -v fd &> /dev/null ; then
 		export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
@@ -164,11 +164,11 @@ fi
 
 if command -v thefuck &> /dev/null ; then
     # Generated with `thefuck --alias`
-    source ./tf-aliases.zsh
+    source "$HOME/.dotfiles/tf-aliases.zsh"
 fi
 
 # Generated with `zoxide init zsh`
-command -v zoxide &> /dev/null && source ./zoxide.zsh
+command -v zoxide &> /dev/null && source "$HOME/.dotfiles/zoxide.zsh"
 
 HISTFILE="$HOME/.zsh_history"
 SAVEHIST=10000

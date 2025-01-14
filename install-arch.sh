@@ -79,7 +79,9 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-mod
 
 # Update neovim plugins.
 echo "Installing Neovim plugins..."
-nvim --headless "+Lazy! sync" "+sleep 5" +MasonUpdate "+sleep 5" +TSUpdateSync "+sleep 5" +qa
+nvim --headless "+Lazy! sync" +qa
+nvim --headless "+MasonUpdate" +qa
+nvim --headless "+TSUpdateSync" +qa
 echo "...done!"
 
 # Change user's default shell to ZSH.

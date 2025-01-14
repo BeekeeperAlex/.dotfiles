@@ -77,6 +77,11 @@ echo "...done!"
 # Install rust.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
+# Update neovim plugins.
+echo "Installing Neovim plugins..."
+nvim --headless "+Lazy! sync" "+sleep 5" +MasonUpdate "+sleep 5" +TSUpdateSync "+sleep 5" +qa
+echo "...done!"
+
 # Change user's default shell to ZSH.
 echo "Authorizing ZSH and setting default shell..."
 sudo sh -c "echo $(which zsh) >> /etc/shells"

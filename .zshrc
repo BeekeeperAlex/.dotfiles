@@ -1,3 +1,5 @@
+[[ -r "$HOME/.dotfiles/wezterm-shell-integration.sh" ]] && source "$HOME/.dotfiles/wezterm-shell-integration.sh"
+
 # Set the terminal title to the current directory.
 function chpwd {
 	echo "\x1b]1337;SetUserVar=panetitle=$(echo -n $(basename $(pwd)) | base64)\x07"

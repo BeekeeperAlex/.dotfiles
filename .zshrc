@@ -162,11 +162,6 @@ if command -v fzf &> /dev/null ; then
 	fi
 fi
 
-if command -v thefuck &> /dev/null ; then
-    # Generated with `thefuck --alias`
-    source "$HOME/.dotfiles/tf-aliases.zsh"
-fi
-
 # Generated with `zoxide init zsh`
 command -v zoxide &> /dev/null && source "$HOME/.dotfiles/zoxide.zsh"
 

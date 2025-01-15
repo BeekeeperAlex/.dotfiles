@@ -49,7 +49,6 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	python-pip \
 	python-setuptools \
 	ripgrep \
-	thefuck \
 	tlrc-bin \
 	unzip \
 	zsh \
@@ -76,13 +75,6 @@ echo "...done!"
 
 # Install rust.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-
-# Update neovim plugins.
-#echo "Installing Neovim plugins..."
-#nvim --headless "+Lazy! sync" +qa
-#nvim --headless "+MasonUpdate" +qa
-#nvim --headless "+TSUpdateSync" +qa
-#echo "...done!"
 
 # Change user's default shell to ZSH.
 echo "Authorizing ZSH and setting default shell..."

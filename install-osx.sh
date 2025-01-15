@@ -59,7 +59,6 @@ brew install \
 	powerlevel10k \
 	python \
 	ripgrep \
-	thefuck \
 	tlrc \
 	volta \
 	wezterm \
@@ -93,11 +92,6 @@ brew install neovim --HEAD || {
 	make CMAKE_BUILD_TYPE=Release
 	sudo make install
 }
-echo "...done!"
-
-# Update neovim plugins.
-echo "Installing Neovim plugins..."
-nvim --headless "+Lazy! sync" "+sleep 5" +MasonUpdate "+sleep 5" +TSUpdateSync "+sleep 5" +qa
 echo "...done!"
 
 echo "Authorizing ZSH and setting default shell..."

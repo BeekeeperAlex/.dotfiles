@@ -47,15 +47,16 @@ config.mouse_wheel_scrolls_tabs = false
 config.native_macos_fullscreen_mode = true
 config.scrollback_lines = 100000
 config.show_tab_index_in_tab_bar = true
-config.tab_bar_at_bottom = false
+config.tab_bar_at_bottom = true
 config.term = "wezterm"
-config.use_fancy_tab_bar = true
+config.use_fancy_tab_bar = false
 config.webgpu_power_preference = "HighPerformance"
 -- config.webgpu_preferred_adapter = wezterm.gui.enumerate_gpus()[2]
 -- config.window_background_opacity = 1
 config.window_close_confirmation = "NeverPrompt"
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
-config.window_padding = { left = 10, right = 10, top = 25, bottom = 10 }
+-- config.window_padding = { left = 10, right = 10, top = 25, bottom = 10 }
+config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
 
 local function get_random_wallpaper()
 	-- Determine system path.

@@ -8,5 +8,6 @@ return {
 				style = "  %I:%M %p",
 			},
 		}
+		return opts
 	end,
 }

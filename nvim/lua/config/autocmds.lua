@@ -13,3 +13,12 @@ vim.api.nvim_create_autocmd("BufEnter", {
 	group = augroup("no_comment_new_line"),
 	desc = "Disable New Line Comment",
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "markdown",
+	callback = function()
+		vim.opt.expandtab = true
+	end,
+	group = augroup("markdown_expandtab"),
+	desc = "Set expandtab for markdown files",
+})

@@ -59,6 +59,7 @@ brew install \
 	powerlevel10k \
 	python \
 	ripgrep \
+	rust-analyzer \
 	tlrc \
 	volta \
 	wezterm \

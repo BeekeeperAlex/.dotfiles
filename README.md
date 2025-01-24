@@ -77,7 +77,7 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (92)
+### Neovim Plugins (94)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
@@ -118,6 +118,7 @@ to run my full Neovim setup and nothing extra.
 - [neoconf.nvim](https://github.com/folke/neoconf.nvim.git)
 - [neogen](https://github.com/danymat/neogen.git)
 - [neotest](https://github.com/nvim-neotest/neotest.git)
+- [neotest-dotnet](https://github.com/Issafalcon/neotest-dotnet.git)
 - [neotest-elixir](https://github.com/jfpedroza/neotest-elixir.git)
 - [neotest-golang](https://github.com/fredrikaverpil/neotest-golang.git)
 - [neotest-playwright](https://github.com/thenbe/neotest-playwright.git)
@@ -145,6 +146,7 @@ to run my full Neovim setup and nothing extra.
 - [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons.git)
 - [octo.nvim](https://github.com/pwntester/octo.nvim.git)
 - [oil.nvim](https://github.com/stevearc/oil.nvim.git)
+- [omnisharp-extended-lsp.nvim](https://github.com/Hoffs/omnisharp-extended-lsp.nvim.git)
 - [one-small-step-for-vimkind](https://github.com/jbyuki/one-small-step-for-vimkind.git)
 - [overseer.nvim](https://github.com/stevearc/overseer.nvim.git)
 - [persistence.nvim](https://github.com/folke/persistence.nvim.git)

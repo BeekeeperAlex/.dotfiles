@@ -21,8 +21,8 @@ config.color_scheme = "GruvboxDarkHard"
 
 config.font_size = 14
 config.font = wezterm.font_with_fallback({
-	{ family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
-	-- { family = "BigBlueTerm437 Nerd Font", weight = "Regular" },
+	-- { family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
+	{ family = "BigBlueTerm437 Nerd Font", weight = "Regular" },
 	-- { family = "Cartograph CF", weight = "Regular" },
 	-- { family = "ComicShannsMono Nerd Font", weight = "Regular" },
 	-- { family = "Fira Code", weight = "Regular" },

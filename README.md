@@ -77,7 +77,7 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (95)
+### Neovim Plugins (99)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
@@ -104,6 +104,7 @@ to run my full Neovim setup and nothing extra.
 - [inc-rename.nvim](https://github.com/smjonas/inc-rename.nvim.git)
 - [kulala.nvim](https://github.com/mistweaverco/kulala.nvim.git)
 - [lazydev.nvim](https://github.com/folke/lazydev.nvim.git)
+- [lua-utils.nvim](https://github.com/nvim-neorg/lua-utils.nvim.git)
 - [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim.git)
 - [markdown-preview.nvim](https://github.com/iamcco/markdown-preview.nvim.git)
 - [mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim.git)
@@ -118,6 +119,8 @@ to run my full Neovim setup and nothing extra.
 - [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim.git)
 - [neoconf.nvim](https://github.com/folke/neoconf.nvim.git)
 - [neogen](https://github.com/danymat/neogen.git)
+- [neorg](https://github.com/nvim-neorg/neorg.git)
+- [neorg-interim-ls](https://github.com/benlubas/neorg-interim-ls.git)
 - [neotest](https://github.com/nvim-neotest/neotest.git)
 - [neotest-dotnet](https://github.com/Issafalcon/neotest-dotnet.git)
 - [neotest-elixir](https://github.com/jfpedroza/neotest-elixir.git)
@@ -150,6 +153,7 @@ to run my full Neovim setup and nothing extra.
 - [omnisharp-extended-lsp.nvim](https://github.com/Hoffs/omnisharp-extended-lsp.nvim.git)
 - [one-small-step-for-vimkind](https://github.com/jbyuki/one-small-step-for-vimkind.git)
 - [overseer.nvim](https://github.com/stevearc/overseer.nvim.git)
+- [pathlib.nvim](https://github.com/pysan3/pathlib.nvim.git)
 - [persistence.nvim](https://github.com/folke/persistence.nvim.git)
 - [playtime.nvim](https://github.com/rktjmp/playtime.nvim.git)
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim.git)

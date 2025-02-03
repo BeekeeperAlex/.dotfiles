@@ -54,7 +54,7 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	unzip \
 	zsh \
 	bun-bin \
-	neovim-nightly-bin \
+	neovim-nightly \
 	volta-bin \
 	zoxide \
 	zsh-theme-powerlevel10k-git \

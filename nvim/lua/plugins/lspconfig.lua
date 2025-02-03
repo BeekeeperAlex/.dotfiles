@@ -1,8 +1,11 @@
 return {
 	{
 		"neovim/nvim-lspconfig",
-		optional = true,
 		opts = {
+			diagnostics = {
+				virtual_text = false,
+				virtual_lines = true,
+			},
 			setup = {
 				-- Hack to suppress encoding error with clangd.
 				clangd = function(_, opts)

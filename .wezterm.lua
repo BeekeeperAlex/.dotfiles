@@ -18,11 +18,12 @@ end
 -- config.color_scheme = "Catppuccin Macchiato"
 -- config.color_scheme = "Catppuccin Mocha"
 config.color_scheme = "GruvboxDarkHard"
+-- config.color_scheme = "Matrix (terminal.sexy)"
 
 config.font_size = 14
 config.font = wezterm.font_with_fallback({
-	-- { family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
-	{ family = "BigBlueTerm437 Nerd Font", weight = "Regular" },
+	{ family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
+	-- { family = "BigBlueTerm437 Nerd Font", weight = "Regular" },
 	-- { family = "Cartograph CF", weight = "Regular" },
 	-- { family = "ComicShannsMono Nerd Font", weight = "Regular" },
 	-- { family = "Fira Code", weight = "Regular" },
@@ -49,7 +50,7 @@ config.scrollback_lines = 100000
 config.show_tab_index_in_tab_bar = true
 config.tab_bar_at_bottom = false
 -- config.term = "wezterm"
-config.use_fancy_tab_bar = false
+config.use_fancy_tab_bar = true
 config.webgpu_power_preference = "HighPerformance"
 -- config.webgpu_preferred_adapter = wezterm.gui.enumerate_gpus()[2]
 -- config.window_background_opacity = 1

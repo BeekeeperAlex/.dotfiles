@@ -1,6 +1,7 @@
 return {
 	{
 		"nvim-neotest/neotest",
+		optional = true,
 		lazy = false,
 		dependencies = {
 			-- Actual Dependencies

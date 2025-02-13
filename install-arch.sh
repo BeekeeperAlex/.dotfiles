@@ -54,7 +54,6 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	unzip \
 	zsh \
 	bun-bin \
-	neovim-nightly \
 	volta-bin \
 	zoxide \
 	zsh-theme-powerlevel10k-git \
@@ -76,6 +75,17 @@ echo "...done!"
 
 # Install rust.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+
+# Install Nix
+sh <(curl -L https://nixos.org/nix/install) --daemon --yes
+
+# Install neovim nightly.
+echo "Installing neovim nightly..."
+sudo git clone https://github.com/neovim/neovim /neovim && (cd /neovim || exit)
+sudo make distclean
+sudo make CMAKE_BUILD_TYPE=Release
+sudo make install
+echo "...done!"
 
 # Change user's default shell to ZSH.
 echo "Authorizing ZSH and setting default shell..."

@@ -83,14 +83,17 @@ echo "...done!"
 # Install rust.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 
+# Install Nix
+sh <(curl -L https://nixos.org/nix/install) --daemon --yes
+
 # Install neovim nightly.
 echo "Installing neovim nightly..."
 brew install neovim --HEAD || {
 	# If status code not zero then install neovim nightly from source.
 	echo "Failed to install neovim nightly from brew. Installing from source..."
-	git clone https://github.com/neovim/neovim /neovim && (cd /neovim || exit)
-	make distclean
-	make CMAKE_BUILD_TYPE=Release
+	sudo git clone https://github.com/neovim/neovim /neovim && (cd /neovim || exit)
+	sudo make distclean
+	sudo make CMAKE_BUILD_TYPE=Release
 	sudo make install
 }
 echo "...done!"

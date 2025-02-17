@@ -57,7 +57,7 @@ config.webgpu_power_preference = "HighPerformance"
 -- config.window_close_confirmation = "NeverPrompt"
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 -- config.window_padding = { left = 10, right = 10, top = 25, bottom = 10 }
-config.window_padding = { left = 0, right = 0, top = 5, bottom = 0 }
+config.window_padding = { left = 0, right = 0, top = 10, bottom = 0 }
 
 -- Determine system path.
 local dotfiles_path = "~/.dotfiles/images/wezterm-wallpapers/"

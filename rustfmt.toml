@@ -1,2 +1,7 @@
+imports_layout = "Vertical"
+format_code_in_doc_comments = true
+group_imports = "StdExternalCrate"
 hard_tabs = true
+reorder_impl_items = true
 tab_spaces = 3
+wrap_comments = true

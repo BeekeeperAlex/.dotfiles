@@ -34,3 +34,5 @@
 ; Leaving this here for futrue reference. Currently using direnv to load .envrc which specifies git creds as env vars.
 ; [includeIf "gitdir:~/work/**/.git"]
 ;     path = ~/.dotfiles/.work.gitconfig
+[safe]
+	directory = /neovim

@@ -77,7 +77,7 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (94)
+### Neovim Plugins (93)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
@@ -93,7 +93,6 @@ to run my full Neovim setup and nothing extra.
 - [copilot.lua](https://github.com/zbirenbaum/copilot.lua.git)
 - [crates.nvim](https://github.com/Saecki/crates.nvim.git)
 - [dial.nvim](https://github.com/monaqa/dial.nvim.git)
-- [edgy.nvim](https://github.com/folke/edgy.nvim.git)
 - [firenvim](https://github.com/glacambre/firenvim.git)
 - [flash.nvim](https://github.com/folke/flash.nvim.git)
 - [friendly-snippets](https://github.com/rafamadriz/friendly-snippets.git)

@@ -10,6 +10,7 @@ return {
 					border = "rounded",
 				},
 			},
+			inlay_hints = { enabled = false },
 			setup = {
 				-- Hack to suppress encoding error with clangd.
 				clangd = function(_, opts)

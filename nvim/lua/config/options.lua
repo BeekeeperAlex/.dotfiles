@@ -2,6 +2,7 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+vim.g.root_spec = { ".git", "compose.yml", "cwd" }
 vim.g.lazyvim_prettier_needs_config = true
 vim.g.rust_recommended_style = "0"
 
@@ -25,16 +26,29 @@ vim.opt.listchars = {
 -- vim.opt.guifont = "ComicShannsMono Nerd Font:h12"
 
 if vim.fn.has("wsl") == 1 then
+	local w32y = vim.fs.joinpath(vim.fn.getenv("HOME"), ".dotfiles", "bin", "win32yank.exe")
 	vim.g.clipboard = {
 		name = "WslClipboard",
 		copy = {
-			["+"] = "clip.exe",
-			["*"] = "clip.exe",
+			["+"] = w32y .. " -i --crlf",
+			["*"] = w32y .. " -i --crlf",
 		},
 		paste = {
-			["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-			["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+			["+"] = w32y .. " -o --lf",
+			["*"] = w32y .. " -o --lf",
 		},
-		cache_enabled = 0,
+		cache_enabled = false,
 	}
+	-- vim.g.clipboard = {
+	-- 	name = "WslClipboard",
+	-- 	copy = {
+	-- 		["+"] = "clip.exe",
+	-- 		["*"] = "clip.exe",
+	-- 	},
+	-- 	paste = {
+	-- 		["+"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+	-- 		["*"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+	-- 	},
+	-- 	cache_enabled = 0,
+	-- }
 end

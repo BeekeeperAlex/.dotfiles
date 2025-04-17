@@ -1,7 +1,7 @@
 import { readFile, writeFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 
-const nvimPluginDir = join(Bun.env.HOME, ".local", "share", "nvim", "lazy");
+const nvimPluginDir = join(Bun.env.HOME!, ".local", "share", "nvim", "lazy");
 const files = await readdir(nvimPluginDir);
 const directories = await Promise.all(
 	files
@@ -17,7 +17,7 @@ const gitRemotes = (
 	await Promise.all(
 		directories.map(async directory => {
 			try {
-				const gitConfigPath = join(nvimPluginDir, directory, ".git", "config");
+				const gitConfigPath = join(nvimPluginDir, directory!, ".git", "config");
 				const configContent = await readFile(gitConfigPath, "utf-8");
 				const match = configContent.match(/\[remote "origin"\][\s\S]*?url = (.+)/);
 				return { name: directory, url: match ? match[1] : null };
@@ -26,11 +26,15 @@ const gitRemotes = (
 			}
 		})
 	)
-).filter(({ name, url }) => url !== null && !["lazy.nvim", "LazyVim"].includes(name));
+)
+	.filter(remote => remote !== null)
+	.filter(
+		({ name, url }) => url !== null && name !== null && !["lazy.nvim", "LazyVim"].includes(name)
+	);
 
 const pluginList = gitRemotes.map(({ name, url }) => `- [${name}](${url})`);
 
-const readmePath = join(process.env.HOME, ".dotfiles", "README.md");
+const readmePath = join(process.env.HOME!, ".dotfiles", "README.md");
 const readmeContent = await readFile(readmePath, "utf-8");
 const lines = readmeContent.split("\n");
 const pluginsHeaderIndex = lines.findIndex(line => line.match(/^### Neovim Plugins/));

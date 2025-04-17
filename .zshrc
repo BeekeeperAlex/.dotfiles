@@ -21,7 +21,7 @@ check_last_run() {
 }
 
 updoot() {
-	echo "System packages have not been updated in more than 24 hours. Updating system packages..."
+	echo "Updating system packages..."
 
 	# If yay is installed then use it to /update the system.
 	command -v yay &> /dev/null && yay -Syuv --needed --noconfirm --disable-download-timeout
@@ -49,12 +49,29 @@ updoot() {
 
 	echo "Github CLI has been updated."
 
+	# Updating Neovim nightly.
+	echo "Updating Neovim nightly..."
+	cd /neovim || { echo "Error: unable to change directory to /neovim. Is it cloned?" >&2; exit 1; }
+	old_commit=$(git rev-parse HEAD)
+	update_output=$(sudo git pull)
+	new_commit=$(git rev-parse HEAD)
+	if [ "$old_commit" != "$new_commit" ]; then
+		echo "New commits detected. Building..."
+		sudo make distclean
+		sudo make CMAKE_BUILD_TYPE=RelWithDebInfo
+		sudo make install
+		echo "...done!"
+	else
+		echo "Already up-to-date."
+	fi
+
 	# Update the timestamp file
 	touch "$TIMESTAMP_FILE"
 }
 
 # Check if we should run system updates.
 if check_last_run; then
+	echo "System packages have not been updated in more than 24 hours."
 	updoot
 fi
 

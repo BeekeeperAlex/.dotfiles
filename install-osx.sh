@@ -63,6 +63,7 @@ brew install \
 	tlrc \
 	volta \
 	wezterm \
+	wordnet \
 	zoxide \
 	zsh-vi-mode \
 	zsh
@@ -86,16 +87,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-mod
 # Install Nix
 sh <(curl -L https://nixos.org/nix/install) --daemon --yes
 
-# Install neovim nightly.
-echo "Installing neovim nightly..."
-brew install neovim --HEAD || {
-	# If status code not zero then install neovim nightly from source.
-	echo "Failed to install neovim nightly from brew. Installing from source..."
-	sudo git clone https://github.com/neovim/neovim /neovim && (cd /neovim || exit)
-	sudo make distclean
-	sudo make CMAKE_BUILD_TYPE=Release
-	sudo make install
-}
+# Install Neovim nightly.
+echo "Installing Neovim nightly..."
+sudo git clone https://github.com/neovim/neovim /neovim && (cd /neovim || exit)
+sudo make distclean
+sudo make CMAKE_BUILD_TYPE=RelWithDebInfo
+sudo make install
 echo "...done!"
 
 echo "Authorizing ZSH and setting default shell..."

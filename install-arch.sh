@@ -55,6 +55,7 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	zsh \
 	bun-bin \
 	volta-bin \
+	wordnet-common \
 	zoxide \
 	zsh-theme-powerlevel10k-git \
 	zsh-vi-mode-git &&
@@ -79,11 +80,11 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-mod
 # Install Nix
 sh <(curl -L https://nixos.org/nix/install) --daemon --yes
 
-# Install neovim nightly.
-echo "Installing neovim nightly..."
+# Install Neovim nightly.
+echo "Installing Neovim nightly..."
 sudo git clone https://github.com/neovim/neovim /neovim && (cd /neovim || exit)
 sudo make distclean
-sudo make CMAKE_BUILD_TYPE=Release
+sudo make CMAKE_BUILD_TYPE=RelWithDebInfo
 sudo make install
 echo "...done!"
 

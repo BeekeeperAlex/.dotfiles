@@ -77,12 +77,14 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (89)
+### Neovim Plugins (91)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
 - [SchemaStore.nvim](https://github.com/b0o/SchemaStore.nvim.git)
 - [blink-cmp-copilot](https://github.com/giuxtaposition/blink-cmp-copilot.git)
+- [blink-cmp-dictionary](https://github.com/Kaiser-Yang/blink-cmp-dictionary.git)
+- [blink-emoji.nvim](https://github.com/moyiz/blink-emoji.nvim.git)
 - [blink.cmp](https://github.com/saghen/blink.cmp.git)
 - [blink.compat](https://github.com/saghen/blink.compat.git)
 - [bufferline.nvim](https://github.com/akinsho/bufferline.nvim.git)

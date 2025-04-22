@@ -64,6 +64,7 @@ updoot() {
 	else
 		echo "Already up-to-date."
 	fi
+	cd - || { echo "Error: unable to return to the previous directory." >&2; exit 1; }
 
 	# Update the timestamp file
 	touch "$TIMESTAMP_FILE"

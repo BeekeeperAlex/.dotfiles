@@ -45,6 +45,7 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	lua51 \
 	luajit \
 	luarocks \
+	lynx \
 	python \
 	python-pip \
 	python-setuptools \

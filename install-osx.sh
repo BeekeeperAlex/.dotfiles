@@ -55,6 +55,7 @@ brew install \
 	lua@5.1 \
 	luajit \
 	luarocks \
+	lynx \
 	fastfetch \
 	powerlevel10k \
 	python \

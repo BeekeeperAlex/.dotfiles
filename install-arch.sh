@@ -40,6 +40,7 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	git-delta \
 	github-cli \
 	go \
+	helm \
 	lazygit \
 	lua \
 	lua51 \

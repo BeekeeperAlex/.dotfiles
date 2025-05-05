@@ -50,6 +50,7 @@ brew install \
 	gh \
 	git-delta \
 	golang \
+	helm \
 	lazygit \
 	lua \
 	lua@5.1 \

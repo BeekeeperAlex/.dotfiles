@@ -93,7 +93,7 @@ end
 config.background = {
 	{
 		source = {
-			File = get_random_wallpaper(),
+			File = "/Users/alexford/.dotfiles/images/background.png", --get_random_wallpaper(),
 		},
 		opacity = 1,
 		attachment = "Fixed",

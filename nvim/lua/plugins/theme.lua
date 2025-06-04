@@ -1,16 +1,16 @@
 return {
 	-- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-3952454
-	-- {
-	-- 	"catppuccin/nvim",
-	-- 	lazy = false,
-	-- 	name = "catppuccin",
-	-- 	opts = {
-	-- 		-- flavour = "frappe",
-	-- 		-- flavour = "macchiato",
-	-- 		flavour = "mocha",
-	-- 		transparent_background = true,
-	-- 	},
-	-- },
+	{
+		"catppuccin/nvim",
+		lazy = false,
+		name = "catppuccin",
+		opts = {
+			-- flavour = "frappe",
+			-- flavour = "macchiato",
+			flavour = "mocha",
+			transparent_background = true,
+		},
+	},
 	{
 		"ellisonleao/gruvbox.nvim",
 		lazy = false,
@@ -38,5 +38,5 @@ return {
 	-- 		vim.g.matrix_disable_background = true
 	-- 	end,
 	-- },
-	{ "LazyVim/LazyVim", opts = { colorscheme = "gruvbox" } },
+	{ "LazyVim/LazyVim", opts = { colorscheme = "catppuccin" } },
 }

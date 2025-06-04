@@ -16,20 +16,21 @@ end
 -- config.color_scheme = "Tokyo Night"
 -- config.color_scheme = "Catppuccin Frappe"
 -- config.color_scheme = "Catppuccin Macchiato"
--- config.color_scheme = "Catppuccin Mocha"
-config.color_scheme = "GruvboxDarkHard"
+config.color_scheme = "Catppuccin Mocha"
+-- config.color_scheme = "GruvboxDarkHard"
 -- config.color_scheme = "Matrix (terminal.sexy)"
 
 config.font_size = 14
 config.font = wezterm.font_with_fallback({
-	{ family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
-	-- { family = "BigBlueTerm437 Nerd Font", weight = "Regular" },
-	-- { family = "Cartograph CF", weight = "Regular" },
+	-- { family = "BigBlueTermPlus Nerd Font", weight = "Regular" },
+	{ family = "BigBlueTerm437 Nerd Font", weight = "Bold" },
+	-- { family = "Cartograph CF", weight = "Bold" },
 	-- { family = "ComicShannsMono Nerd Font", weight = "Regular" },
+	-- { family = "Comic Shanns", weight = "Regular" },
 	-- { family = "Fira Code", weight = "Regular" },
 	-- { family = "ProggyClean Nerd Font", weight = "Regular" },
 	-- { family = "ShureTechMono Nerd Font", weight = "Regular" },
-	-- { family = "Terminess Nerd Font", weight = "Regular" },
+	-- { family = "Terminess Nerd Font", weight = "Bold" },
 	-- { family = "UbuntuMono Nerd Font", weight = "Regular" },
 })
 
@@ -60,9 +61,9 @@ config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 config.window_padding = { left = 0, right = 0, top = 10, bottom = 0 }
 
 -- Determine system path.
-local dotfiles_path = "~/.dotfiles/images/wezterm-wallpapers/"
+local wallpaper_path = "~/.dotfiles/images/wezterm-wallpapers/"
 if wezterm.target_triple:match("windows") then
-	dotfiles_path = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\"
+	wallpaper_path = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\"
 	config.wsl_domains = {
 		{
 			name = "WSL:Arch",
@@ -76,12 +77,12 @@ if wezterm.target_triple:match("windows") then
 	-- config.default_prog = { "wsl.exe" }
 	config.win32_system_backdrop = "Disable" -- ["Auto", "Acrylic", "Mica", "Tabbed" "Disable"]
 elseif wezterm.target_triple:match("darwin") then
-	dotfiles_path = "/Users/alexford/.dotfiles/images/wezterm-wallpapers/"
+	wallpaper_path = "/Users/alexford/.dotfiles/images/wezterm-wallpapers/"
 end
 
 local function get_random_wallpaper()
 	-- Get random wallpaper image.
-	local wallpapers = wezterm.read_dir(dotfiles_path)
+	local wallpapers = wezterm.read_dir(wallpaper_path)
 	if #wallpapers > 0 then
 		math.randomseed(os.time())
 		return wallpapers[math.random(#wallpapers)]
@@ -93,7 +94,7 @@ end
 config.background = {
 	{
 		source = {
-			File = "/Users/alexford/.dotfiles/images/background.png", --get_random_wallpaper(),
+			File = wallpaper_path .. "svgmeadow.png", --get_random_wallpaper(),
 		},
 		opacity = 1,
 		attachment = "Fixed",
@@ -106,9 +107,9 @@ config.background = {
 	},
 	{
 		source = {
-			Color = color_schemes[config.color_scheme].background,
+			Color = "#000000", --color_schemes[config.color_scheme].background,
 		},
-		opacity = 0.9,
+		opacity = 0.7,
 		width = "100%",
 		height = "100%",
 	},

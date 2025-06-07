@@ -104,6 +104,12 @@ return {
 			---@type Neominimap.UserConfig
 			vim.g.neominimap = {
 				auto_enable = true,
+				split = {
+					minimap_widhth = 5,
+				},
+				float = {
+					minimap_width = 5,
+				},
 			}
 		end,
 	},

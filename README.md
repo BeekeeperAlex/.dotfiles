@@ -77,7 +77,7 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (92)
+### Neovim Plugins (93)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
@@ -89,6 +89,7 @@ to run my full Neovim setup and nothing extra.
 - [blink.compat](https://github.com/saghen/blink.compat.git)
 - [bufferline.nvim](https://github.com/akinsho/bufferline.nvim.git)
 - [catppuccin](https://github.com/catppuccin/nvim.git)
+- [clangd_extensions.nvim](https://github.com/p00f/clangd_extensions.nvim.git)
 - [cloak.nvim](https://github.com/laytan/cloak.nvim.git)
 - [cmake-tools.nvim](https://github.com/Civitasv/cmake-tools.nvim.git)
 - [codeium.nvim](https://github.com/Exafunction/codeium.nvim.git)

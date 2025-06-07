@@ -63,21 +63,21 @@ config.window_padding = { left = 0, right = 0, top = 10, bottom = 0 }
 -- Determine system path.
 local wallpaper_path = "~/.dotfiles/images/wezterm-wallpapers/"
 if wezterm.target_triple:match("windows") then
-	wallpaper_path = "\\\\wsl.localhost\\Arch\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\"
+	wallpaper_path = "\\\\wsl.localhost\\archlinux\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\"
 	config.wsl_domains = {
 		{
-			name = "WSL:Arch",
-			distribution = "Arch",
+			name = "WSL:archlinux",
+			distribution = "archlinux",
 			username = "chev",
 			default_cwd = "/home/chev",
 		},
 	}
-	config.default_domain = "WSL:Arch"
+	config.default_domain = "WSL:archlinux"
 	config.default_cwd = "/home/chev"
 	-- config.default_prog = { "wsl.exe" }
 	config.win32_system_backdrop = "Disable" -- ["Auto", "Acrylic", "Mica", "Tabbed" "Disable"]
 elseif wezterm.target_triple:match("darwin") then
-	wallpaper_path = "/Users/alexford/.dotfiles/images/wezterm-wallpapers/"
+	wallpaper_path = "/Users/chev/.dotfiles/images/wezterm-wallpapers/"
 end
 
 local function get_random_wallpaper()

@@ -42,7 +42,7 @@ echo "...done! Backups were saved to $HOME/.backup_dotfiles/ and symlinks were c
 # If WSL, then create Windows symbolic links in Windows user directory.
 if command -v powershell.exe &>/dev/null; then
 	echo "Creating Windows symlink to wezterm config file..."
-	WEZTERM_CONFIG_PATH=$(echo "//wsl.localhost/Arch${DOTFILES_DIR}/.wezterm.lua" | sed 's/\//\\/g')
+	WEZTERM_CONFIG_PATH=$(echo "//wsl.localhost/archlinux${DOTFILES_DIR}/.wezterm.lua" | sed 's/\//\\/g')
 	if powershell.exe -Command "Test-Path \$env:USERPROFILE\\.wezterm.lua" >/dev/null; then
 		powershell.exe -Command "Remove-Item -Recurse -Force \$env:USERPROFILE\\.wezterm.lua" >/dev/null
 	fi
@@ -50,7 +50,7 @@ if command -v powershell.exe &>/dev/null; then
 	echo "...done!"
 
 	echo "Creating Windows symlink to wezterm directory..."
-	WEZTERM_DIR_PATH=$(echo "//wsl.localhost/Arch${DOTFILES_DIR}/wezterm" | sed 's/\//\\/g')
+	WEZTERM_DIR_PATH=$(echo "//wsl.localhost/archlinux${DOTFILES_DIR}/wezterm" | sed 's/\//\\/g')
 	if powershell.exe -Command "Test-Path \$env:USERPROFILE\\.wezterm" >/dev/null; then
 		powershell.exe -Command "Remove-Item -Recurse -Force \$env:USERPROFILE\\.wezterm" >/dev/null
 	fi
@@ -58,7 +58,7 @@ if command -v powershell.exe &>/dev/null; then
 	echo "...done!"
 
 	echo "Creating Windows symlink to nvim config directory..."
-	NVIM_CONFIG_PATH=$(echo "//wsl.localhost/Arch${DOTFILES_DIR}/nvim" | sed 's/\//\\/g')
+	NVIM_CONFIG_PATH=$(echo "//wsl.localhost/archlinux${DOTFILES_DIR}/nvim" | sed 's/\//\\/g')
 	if powershell.exe -Command "Test-Path \$env:USERPROFILE\\AppData\\Local\\nvim" >/dev/null; then
 		powershell.exe -Command "Remove-Item -Recurse -Force \$env:USERPROFILE\\AppData\\Local\\nvim" >/dev/null
 	fi

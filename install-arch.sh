@@ -17,7 +17,11 @@ sudo pacman-key --init
 echo "Updating system and installing base packages..."
 sudo pacman -Sv --noconfirm --needed --disable-download-timeout \
 	git \
-	base-devel
+	base-devel \
+	cmake \
+	unzip \
+	ninja \
+	curl
 echo "...done!"
 
 # Install yay and remaining packages.
@@ -30,7 +34,6 @@ makepkg -si --noconfirm
 yay -Syuv --noconfirm --needed --disable-download-timeout \
 	azure-cli \
 	bat \
-	curl \
 	direnv \
 	dotnet-sdk \
 	eza \
@@ -53,11 +56,9 @@ yay -Syuv --noconfirm --needed --disable-download-timeout \
 	ripgrep \
 	rust-analyzer \
 	tlrc-bin \
-	unzip \
 	zsh \
 	bun-bin \
 	volta-bin \
-	wordnet-common \
 	zoxide \
 	zsh-theme-powerlevel10k-git \
 	zsh-vi-mode-git &&
@@ -78,9 +79,6 @@ echo "...done!"
 
 # Install rust.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-
-# Install Nix
-sh <(curl -L https://nixos.org/nix/install) --daemon --yes
 
 # Install Neovim nightly.
 echo "Installing Neovim nightly..."

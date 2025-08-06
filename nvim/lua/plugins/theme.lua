@@ -38,5 +38,5 @@ return {
 	-- 		vim.g.matrix_disable_background = true
 	-- 	end,
 	-- },
-	{ "LazyVim/LazyVim", opts = { colorscheme = "catppuccin" } },
+	{ "LazyVim/LazyVim", opts = { colorscheme = "gruvbox" } },
 }

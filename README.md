@@ -77,7 +77,7 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (93)
+### Neovim Plugins (92)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
@@ -115,7 +115,6 @@ to run my full Neovim setup and nothing extra.
 - [mini.hipatterns](https://github.com/echasnovski/mini.hipatterns.git)
 - [mini.icons](https://github.com/echasnovski/mini.icons.git)
 - [neoconf.nvim](https://github.com/folke/neoconf.nvim.git)
-- [neominimap.nvim](https://github.com/Isrothy/neominimap.nvim.git)
 - [neotest](https://github.com/nvim-neotest/neotest.git)
 - [neotest-dotnet](https://github.com/Issafalcon/neotest-dotnet.git)
 - [neotest-elixir](https://github.com/jfpedroza/neotest-elixir.git)

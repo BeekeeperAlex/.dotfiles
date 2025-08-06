@@ -16,8 +16,8 @@ end
 -- config.color_scheme = "Tokyo Night"
 -- config.color_scheme = "Catppuccin Frappe"
 -- config.color_scheme = "Catppuccin Macchiato"
-config.color_scheme = "Catppuccin Mocha"
--- config.color_scheme = "GruvboxDarkHard"
+-- config.color_scheme = "Catppuccin Mocha"
+config.color_scheme = "GruvboxDarkHard"
 -- config.color_scheme = "Matrix (terminal.sexy)"
 
 config.font_size = 14
@@ -94,7 +94,8 @@ end
 config.background = {
 	{
 		source = {
-			File = wallpaper_path .. "svgmeadow.png", --get_random_wallpaper(),
+			-- File = wallpaper_path .. "svgmeadow.png",
+			File = get_random_wallpaper(),
 		},
 		opacity = 1,
 		attachment = "Fixed",
@@ -107,9 +108,10 @@ config.background = {
 	},
 	{
 		source = {
-			Color = "#000000", --color_schemes[config.color_scheme].background,
+			-- Color = "#000000",
+			Color = color_schemes[config.color_scheme].background,
 		},
-		opacity = 0.7,
+		opacity = 0.9,
 		width = "100%",
 		height = "100%",
 	},

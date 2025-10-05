@@ -1,41 +1,45 @@
-FROM archlinux:latest
+FROM ubuntu:22.04
 
-# Place docker environment file early so we can detect during build that we are running in a container.
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
+
 RUN touch /.dockerenv
 
-# Define default user and group.
 ENV USERNAME=chev
 ENV USER_UID=1000
 ENV USER_GID=1000
 
-# Upgrade system, install sudo, and clean up.
-RUN pacman -Syuv --noconfirm && \
-	pacman -Sv --noconfirm sudo && \
-	pacman -Sccv --noconfirm
+RUN ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime && \
+	apt-get update -y && \
+	apt-get install -y --no-install-recommends \
+		build-essential \
+		ca-certificates \
+		curl \
+		file \
+		git \
+		procps \
+		sudo \
+		tzdata \
+		unzip && \
+	rm -rf /var/lib/apt/lists/* && \
+	dpkg-reconfigure --frontend noninteractive tzdata
 
-# Create a non-root user with sudo privileges.
 RUN groupadd --gid ${USER_GID} ${USERNAME} && \
 	useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} && \
 	echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USERNAME} && \
 	chmod 0440 /etc/sudoers.d/${USERNAME}
 
-# Switch to the new user.
 USER ${USERNAME}
 
-# Set user and home variables.
 ENV USER=${USERNAME}
 ENV HOME=/home/${USERNAME}
 
-# Copy .dotfiles into image, taking ownership as we do.
 COPY --chown=${USERNAME} ./ ${HOME}/.dotfiles
 
-# Run install script.
 WORKDIR ${HOME}/.dotfiles
-RUN ./install-arch.sh
+RUN ./install.sh
 
-# Set user-specific environment variables.
-ENV SHELL=/bin/zsh
+ENV SHELL=/usr/bin/zsh
 ENV TERM=xterm-256color
 
-# Start Zsh login session by default.
 CMD ["zsh", "-l"]

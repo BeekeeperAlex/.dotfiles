@@ -1,5 +1,7 @@
 [[ -r "$HOME/.dotfiles/wezterm-shell-integration.sh" ]] && source "$HOME/.dotfiles/wezterm-shell-integration.sh"
 
+: "${NEOVIM_SRC_DIR:=$HOME/.cache/neovim}"
+
 # Set the terminal title to the current directory.
 function chpwd {
 	echo "\x1b]1337;SetUserVar=panetitle=$(echo -n $(basename $(pwd)) | base64)\x07"
@@ -13,18 +15,15 @@ check_last_run() {
 		last_run=$(date -r "$TIMESTAMP_FILE" +%s)
 		current_time=$(date +%s)
 		time_diff=$((current_time - last_run))
-		if [ $time_diff -lt 86400 ]; then
-			return 1 # Less than 24 hours.
+		if [ $time_diff -lt 604800 ]; then
+			return 1 # Less than 7 days.
 		fi
 	fi
-	return 0 # More than 24 hours or timestamp file doesn't exist.
+	return 0 # More than 7 days or timestamp file doesn't exist.
 }
 
 updoot() {
 	echo "Updating system packages..."
-
-	# If yay is installed then use it to /update the system.
-	command -v yay &> /dev/null && yay -Syuv --needed --noconfirm --disable-download-timeout
 
 	# If brew is installed then update and upgrade.
 	command -v brew &> /dev/null && brew update -v && brew upgrade -v
@@ -51,20 +50,24 @@ updoot() {
 
 	# Updating Neovim nightly.
 	echo "Updating Neovim nightly..."
-	cd /neovim || { echo "Error: unable to change directory to /neovim. Is it cloned?" >&2; exit 1; }
-	old_commit=$(git rev-parse HEAD)
-	update_output=$(sudo git pull)
-	new_commit=$(git rev-parse HEAD)
-	if [ "$old_commit" != "$new_commit" ]; then
-		echo "New commits detected. Building..."
-		sudo make distclean
-		sudo make CMAKE_BUILD_TYPE=RelWithDebInfo
-		sudo make install
-		echo "...done!"
+	if [[ -d "$NEOVIM_SRC_DIR/.git" ]]; then
+		pushd "$NEOVIM_SRC_DIR" > /dev/null || { echo "Error: unable to change directory to $NEOVIM_SRC_DIR." >&2; exit 1; }
+		old_commit=$(git rev-parse HEAD)
+		git pull --ff-only
+		new_commit=$(git rev-parse HEAD)
+		if [ "$old_commit" != "$new_commit" ]; then
+			echo "New commits detected. Building..."
+			make distclean
+			make CMAKE_BUILD_TYPE=RelWithDebInfo
+			sudo make install
+			echo "...done!"
+		else
+			echo "Already up-to-date."
+		fi
+		popd > /dev/null || { echo "Error: unable to return to the previous directory." >&2; exit 1; }
 	else
-		echo "Already up-to-date."
+		echo "Neovim source directory not found at $NEOVIM_SRC_DIR. Skipping Neovim update."
 	fi
-	cd - || { echo "Error: unable to return to the previous directory." >&2; exit 1; }
 
 	# Update the timestamp file
 	touch "$TIMESTAMP_FILE"
@@ -72,7 +75,7 @@ updoot() {
 
 # Check if we should run system updates.
 if check_last_run; then
-	echo "System packages have not been updated in more than 24 hours."
+	echo "System packages have not been updated in more than 7 days."
 	updoot
 fi
 

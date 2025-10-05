@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+NEOVIM_SRC_DIR="${HOME}/.cache/neovim"
+
+log() {
+	printf '\n[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"
+}
+
+fail() {
+	printf '\nERROR: %s\n' "$*" >&2
+	exit 1
+}
+
+command_exists() {
+	command -v "$1" >/dev/null 2>&1
+}
+
+confirm_sudo() {
+	if ! command_exists sudo; then
+		fail "sudo is required. Please install sudo and rerun."
+	fi
+	if ! sudo -n true >/dev/null 2>&1; then
+		log "sudo access is required. You may be prompted for your password."
+		sudo true
+	fi
+}
+
+ensure_network() {
+	local target="https://github.com"
+	if ! curl -fsSL --connect-timeout 10 --max-time 20 "$target" >/dev/null; then
+		fail "Network check failed for ${target}. Please ensure internet connectivity."
+	fi
+}
+
+platform=""
+case "$(uname -s)" in
+	Darwin)
+		platform="macos"
+		;;
+	Linux)
+		if [[ -f /etc/os-release ]]; then
+			. /etc/os-release
+			if [[ "${ID:-}" == "ubuntu" ]] || [[ "${ID_LIKE:-}" == *ubuntu* ]] || [[ "${ID_LIKE:-}" == *debian* ]]; then
+				platform="ubuntu"
+			fi
+		fi
+		;;
+	esac
+
+[[ -n "$platform" ]] || fail "Unsupported platform. Only macOS and Ubuntu are supported."
+
+log "Running bootstrap on ${platform}."
+confirm_sudo
+ensure_network
+
+log "Installing WezTerm terminfo"
+tempfile="$(mktemp)"
+trap 'rm -f "$tempfile"' EXIT
+curl -fsSL -o "$tempfile" https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo
+/usr/bin/tic -x -o "$HOME/.terminfo" "$tempfile"
+rm -f "$tempfile"
+trap - EXIT
+
+log "Linking dotfiles"
+bash "${PWD}/create-symlinks.sh"
+
+if [[ "$platform" == "macos" ]]; then
+	if ! xcode-select -p >/dev/null 2>&1; then
+		log "Installing Xcode Command Line Tools"
+		xcode-select --install || true
+		while ! xcode-select -p >/dev/null 2>&1; do
+			log "Waiting for Xcode Command Line Tools installation..."
+			sleep 20
+		done
+	fi
+else
+	log "Installing Ubuntu prerequisites"
+	sudo apt-get update -y
+	sudo apt-get install -y --no-install-recommends \
+		build-essential \
+		ca-certificates \
+		curl \
+		file \
+		git \
+		procps \
+		sudo \
+		tzdata \
+		unzip
+	sudo apt-get clean
+fi
+
+log "Bootstrapping Homebrew"
+export HOMEBREW_NO_ENV_HINTS=1
+if ! command_exists brew; then
+	export NONINTERACTIVE=1
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+if command_exists /opt/homebrew/bin/brew; then
+	BREW_BIN=/opt/homebrew/bin/brew
+elif command_exists /home/linuxbrew/.linuxbrew/bin/brew; then
+	BREW_BIN=/home/linuxbrew/.linuxbrew/bin/brew
+else
+	BREW_BIN="$(command -v brew)"
+fi
+
+eval "$("${BREW_BIN}" shellenv)"
+
+log "Ensuring brew taps"
+brew tap jesseduffield/lazygit >/dev/null
+brew tap oven-sh/bun >/dev/null
+brew tap wez/wezterm-linuxbrew >/dev/null
+
+log "Updating brew"
+brew update
+brew upgrade
+
+brew_formulae=(
+	azure-cli
+	bat
+	bun
+	cmake
+	direnv
+	dotnet
+	eza
+	fastfetch
+	fd
+	fzf
+	gcc
+	gh
+	git-delta
+	go
+	helm
+	gettext
+	libtool
+	lazygit
+	lua
+	lua@5.1
+	luajit
+	luarocks
+	lynx
+	ninja
+	automake
+	pkg-config
+	python@3.12
+	ripgrep
+	rust-analyzer
+	tlrc
+	volta
+	wezterm
+	wordnet
+	zoxide
+	zsh
+	zsh-vi-mode
+)
+
+if [[ "$platform" == "ubuntu" ]]; then
+	brew_formulae+=(llvm)
+fi
+
+log "Installing brew packages"
+brew install "${brew_formulae[@]}"
+
+log "Cloning fzf-git"
+if [[ -d "$HOME/.fzf-git/.git" ]]; then
+	git -C "$HOME/.fzf-git" pull --ff-only
+elif [[ -d "$HOME/.fzf-git" ]]; then
+	log "Existing ~/.fzf-git directory without git found. Skipping clone."
+else
+	git clone https://github.com/junegunn/fzf-git.sh.git "$HOME/.fzf-git"
+fi
+
+log "Installing Node via Volta"
+export PATH="$HOME/.volta/bin:$PATH"
+volta install node@latest
+
+log "Installing Rust toolchain"
+if [[ -x "$HOME/.cargo/bin/rustup" ]]; then
+	"$HOME/.cargo/bin/rustup" self update
+	"$HOME/.cargo/bin/rustup" update stable
+else
+	curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --no-modify-path
+fi
+
+if [[ -f "$HOME/.cargo/env" ]]; then
+	source "$HOME/.cargo/env"
+fi
+
+log "Building Neovim from source into ${NEOVIM_SRC_DIR}"
+if [[ -d "${NEOVIM_SRC_DIR}/.git" ]]; then
+	git -C "${NEOVIM_SRC_DIR}" fetch --tags --prune
+	git -C "${NEOVIM_SRC_DIR}" reset --hard origin/master
+else
+	rm -rf "${NEOVIM_SRC_DIR}"
+	git clone https://github.com/neovim/neovim.git "${NEOVIM_SRC_DIR}"
+fi
+
+pushd "${NEOVIM_SRC_DIR}" >/dev/null
+make distclean
+make CMAKE_BUILD_TYPE=RelWithDebInfo
+sudo make install
+popd >/dev/null
+
+if [[ "$platform" == "ubuntu" ]]; then
+	sudo ldconfig
+fi
+
+log "Setting default shell to zsh"
+zsh_path="$(command -v zsh)"
+if [[ -n "$zsh_path" ]]; then
+	if ! grep -Fq "$zsh_path" /etc/shells; then
+		sudo sh -c "echo ${zsh_path} >> /etc/shells"
+	fi
+	current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+	if [[ "$current_shell" != "$zsh_path" ]]; then
+		sudo chsh -s "$zsh_path" "$USER"
+	fi
+fi
+
+log "Bootstrap complete. Please restart your shell."

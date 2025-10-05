@@ -25,8 +25,19 @@ check_last_run() {
 updoot() {
 	echo "Updating system packages..."
 
+	if command -v apt-get &> /dev/null; then
+		sudo apt-get update -y
+		sudo apt-get upgrade -y
+		sudo apt-get autoremove -y
+		sudo apt-get clean
+	fi
+
 	# If brew is installed then update and upgrade.
-	command -v brew &> /dev/null && brew update -v && brew upgrade -v
+	if command -v brew &> /dev/null; then
+		brew update -v
+		brew upgrade -v
+		brew cleanup -s --prune=all
+	fi
 
 	echo "System packages have been updated."
 
@@ -47,6 +58,19 @@ updoot() {
 	command -v gh &> /dev/null && gh extension upgrade --all
 
 	echo "Github CLI has been updated."
+
+	# Ensure mise-managed runtimes are up to date.
+	if command -v mise &> /dev/null; then
+		echo "Updating mise runtimes..."
+		mise install
+		mise upgrade
+		mise doctor || echo "mise doctor reported issues; see output above." >&2
+	fi
+
+	if command -v npm &> /dev/null; then
+		echo "Refreshing global coding agents..."
+		npm install -g @openai/codex @just-every/code
+	fi
 
 	# Updating Neovim nightly.
 	echo "Updating Neovim nightly..."

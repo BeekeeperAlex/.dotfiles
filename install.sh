@@ -120,7 +120,6 @@ brew upgrade
 brew_formulae=(
 	azure-cli
 	bat
-	bun
 	cmake
 	direnv
 	dotnet
@@ -136,19 +135,14 @@ brew_formulae=(
 	gettext
 	libtool
 	lazygit
-	lua
-	lua@5.1
-	luajit
-	luarocks
 	lynx
+	mise
 	ninja
 	automake
 	pkg-config
-	python@3.12
 	ripgrep
 	rust-analyzer
 	tlrc
-	volta
 	wezterm
 	wordnet
 	zoxide
@@ -172,21 +166,39 @@ else
 	git clone https://github.com/junegunn/fzf-git.sh.git "$HOME/.fzf-git"
 fi
 
-log "Installing Node via Volta"
-export PATH="$HOME/.volta/bin:$PATH"
-volta install node@latest
-
-log "Installing Rust toolchain"
-if [[ -x "$HOME/.cargo/bin/rustup" ]]; then
-	"$HOME/.cargo/bin/rustup" self update
-	"$HOME/.cargo/bin/rustup" update stable
-else
-	curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --no-modify-path
+log "Configuring mise runtimes"
+if ! command_exists mise; then
+	fail "mise is not available after Homebrew installation"
 fi
 
-if [[ -f "$HOME/.cargo/env" ]]; then
-	source "$HOME/.cargo/env"
+mise_globals=(
+	node@latest
+	bun@latest
+	lua@latest
+	python@latest
+	rust@stable
+)
+
+for tool in "${mise_globals[@]}"; do
+	log "Ensuring ${tool} via mise"
+	mise use -g "$tool"
+done
+
+mise install
+
+eval "$(mise activate bash)"
+
+log "Running mise doctor"
+if ! mise doctor; then
+	fail "mise doctor reported issues. Please resolve them and rerun."
 fi
+
+if ! command_exists npm; then
+	fail "npm is not available after mise activation"
+fi
+
+log "Installing global coding agents via npm"
+npm install -g @openai/codex @just-every/code
 
 log "Building Neovim from source into ${NEOVIM_SRC_DIR}"
 if [[ -d "${NEOVIM_SRC_DIR}/.git" ]]; then

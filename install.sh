@@ -79,6 +79,7 @@ else
 	sudo apt-get update -y
 	sudo apt-get install -y --no-install-recommends \
 		build-essential \
+		cmake \
 		ca-certificates \
 		curl \
 		file \

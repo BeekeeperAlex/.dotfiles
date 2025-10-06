@@ -99,6 +99,15 @@ updoot() {
 		echo "Neovim source directory not found at $NEOVIM_SRC_DIR. Skipping Neovim update."
 	fi
 
+	if command -v nvim &> /dev/null; then
+		echo "Priming Neovim plugins (Lazy sync, MasonUpdate, TSUpdateSync)..."
+		if ! nvim --headless "+Lazy! sync" "+MasonUpdate" "+TSUpdateSync" +qa; then
+			echo "Failed to prime Neovim plugins." >&2
+		else
+			echo "Neovim plugins primed."
+		fi
+	fi
+
 	# Update the timestamp file
 	touch "$TIMESTAMP_FILE"
 }

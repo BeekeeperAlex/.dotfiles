@@ -33,6 +33,18 @@ ensure_network() {
 	fi
 }
 
+bootstrap_neovim() {
+	if ! command_exists nvim; then
+		log "Skipping Neovim bootstrap. 'nvim' not found in PATH."
+		return
+	fi
+
+	log "Priming Neovim plugins (Lazy sync, MasonUpdate, TSUpdateSync)"
+	if ! nvim --headless "+Lazy! sync" "+MasonUpdate" "+TSUpdateSync" +qa; then
+		fail "Neovim plugin bootstrap failed."
+	fi
+}
+
 platform=""
 case "$(uname -s)" in
 	Darwin)
@@ -224,6 +236,8 @@ popd >/dev/null
 if [[ "$platform" == "ubuntu" ]]; then
 	sudo ldconfig
 fi
+
+bootstrap_neovim
 
 log "Setting default shell to zsh"
 zsh_path="$(command -v zsh)"

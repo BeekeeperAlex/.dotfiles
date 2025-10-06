@@ -20,7 +20,8 @@ RUN ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime && \
 		procps \
 		sudo \
 		tzdata \
-		unzip && \
+		unzip \
+		zsh && \
 	rm -rf /var/lib/apt/lists/* && \
 	dpkg-reconfigure --frontend noninteractive tzdata
 

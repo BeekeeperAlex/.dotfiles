@@ -12,6 +12,7 @@ files=(
 	"$HOME/.wezterm.lua:$DOTFILES_DIR/.wezterm.lua"
 	"$HOME/.zprofile:$DOTFILES_DIR/.zprofile"
 	"$HOME/.zshrc:$DOTFILES_DIR/.zshrc"
+	"$HOME/.tool-versions:$DOTFILES_DIR/.tool-versions"
 	"$HOME/rustfmt.toml:$DOTFILES_DIR/rustfmt.toml"
 )
 

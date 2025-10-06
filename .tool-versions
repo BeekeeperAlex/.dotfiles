@@ -1,0 +1,5 @@
+node latest
+bun latest
+lua latest
+python latest
+rust stable

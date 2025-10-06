@@ -81,9 +81,15 @@ updoot() {
 		new_commit=$(git rev-parse HEAD)
 		if [ "$old_commit" != "$new_commit" ]; then
 			echo "New commits detected. Building..."
-			make distclean
-			make CMAKE_BUILD_TYPE=RelWithDebInfo
-			sudo make install
+			export CMAKE_GENERATOR=Ninja
+			export DEPS_CMAKE_GENERATOR=Ninja
+			export CMAKE_MAKE_PROGRAM="$(command -v ninja)"
+			rm -rf build .deps
+			cmake -S cmake.deps -B .deps -G Ninja
+			cmake --build .deps
+			cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+			cmake --build build
+			sudo cmake --install build
 			echo "...done!"
 		else
 			echo "Already up-to-date."
@@ -138,9 +144,6 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 # typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND="#FF6AC1"
 # typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND="#FF5c57"
 
-# Generated with `direnv hook zsh`
-command -v direnv &> /dev/null && source "$HOME/.dotfiles/direnv-hook.zsh"
-
 # If gh-copilot is installed then configure its default aliases.
 # ghcs - Github Copilot Suggest
 # ghce - Github Copilot Explain
@@ -150,11 +153,13 @@ gh copilot -v &> /dev/null && source "$HOME/.dotfiles/copilot-aliases.zsh"
 # If homebrew is installed then source zsh plugins from their brew locations.
 # Otherwise source from their default locations.
 if command -v brew &> /dev/null; then
-	source "$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme"
-	source "$(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+	P10K_THEME="$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme"
+	ZVM_PLUGIN="$(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+	[[ -f "$P10K_THEME" ]] && source "$P10K_THEME"
+	[[ -f "$ZVM_PLUGIN" ]] && source "$ZVM_PLUGIN"
 else
-	source "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
-	source "/usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+	[[ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]] && source "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
+	[[ -f "/usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh" ]] && source "/usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
 fi
 
 # If fzf is installed them pull in its shell completion and key bindings.

@@ -121,7 +121,6 @@ brew_formulae=(
 	azure-cli
 	bat
 	cmake
-	direnv
 	dotnet
 	eza
 	fastfetch
@@ -147,6 +146,7 @@ brew_formulae=(
 	wordnet
 	zoxide
 	zsh
+	powerlevel10k
 	zsh-vi-mode
 )
 
@@ -210,9 +210,15 @@ else
 fi
 
 pushd "${NEOVIM_SRC_DIR}" >/dev/null
-make distclean
-make CMAKE_BUILD_TYPE=RelWithDebInfo
-sudo make install
+export CMAKE_GENERATOR=Ninja
+export DEPS_CMAKE_GENERATOR=Ninja
+export CMAKE_MAKE_PROGRAM="$(command -v ninja)"
+rm -rf build .deps
+cmake -S cmake.deps -B .deps -G Ninja
+cmake --build .deps
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build
+sudo cmake --install build
 popd >/dev/null
 
 if [[ "$platform" == "ubuntu" ]]; then

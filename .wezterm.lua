@@ -63,17 +63,45 @@ config.window_padding = { left = 0, right = 0, top = 10, bottom = 0 }
 -- Determine system path.
 local wallpaper_path = "~/.dotfiles/images/wezterm-wallpapers/"
 if wezterm.target_triple:match("windows") then
-	wallpaper_path = "\\\\wsl.localhost\\archlinux\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\"
-	config.wsl_domains = {
-		{
-			name = "WSL:archlinux",
-			distribution = "archlinux",
-			username = "chev",
-			default_cwd = "/home/chev",
-		},
-	}
-	config.default_domain = "WSL:archlinux"
+	local preferred = { "Ubuntu", "archlinux" }
+	local available = {}
+	for _, domain in ipairs(wezterm.default_wsl_domains()) do
+		available[domain.distribution] = domain
+	end
+
+	config.wsl_domains = {}
+	local default_domain_name
+	for _, distro in ipairs(preferred) do
+		local domain = available[distro]
+		if domain then
+			domain.username = "chev"
+			domain.default_cwd = "/home/chev"
+			table.insert(config.wsl_domains, domain)
+			if not default_domain_name and distro == "Ubuntu" then
+				default_domain_name = domain.name
+			end
+		end
+	end
+
+	if config.wsl_domains[1] and not default_domain_name then
+		default_domain_name = config.wsl_domains[1].name
+	end
+
+	if default_domain_name then
+		config.default_domain = default_domain_name
+	end
 	config.default_cwd = "/home/chev"
+
+	local wallpaper_distro = preferred[1]
+	if not available[wallpaper_distro] then
+		for _, distro in ipairs(preferred) do
+			if available[distro] then
+				wallpaper_distro = distro
+				break
+			end
+		end
+	end
+	wallpaper_path = string.format("\\\\wsl.localhost\\%s\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\", wallpaper_distro or "Ubuntu")
 	-- config.default_prog = { "wsl.exe" }
 	config.win32_system_backdrop = "Disable" -- ["Auto", "Acrylic", "Mica", "Tabbed" "Disable"]
 elseif wezterm.target_triple:match("darwin") then

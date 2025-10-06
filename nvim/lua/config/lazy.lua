@@ -18,6 +18,9 @@ require("lazy").setup({
 	ui = {
 		border = "rounded",
 	},
+	rocks = {
+		hererocks = true,
+	},
 	spec = {
 		-- Import built-in LazyVim specs.
 		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },

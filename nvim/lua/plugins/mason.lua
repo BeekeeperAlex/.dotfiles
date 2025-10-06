@@ -1,6 +1,14 @@
 return {
 	"mason-org/mason.nvim",
 	optional = true,
+	cmd = {
+		"Mason",
+		"MasonInstall",
+		"MasonUninstall",
+		"MasonUninstallAll",
+		"MasonUpdate",
+		"MasonLog",
+	},
 	opts = {
 		ensure_installed = {
 			"rust-analyzer",

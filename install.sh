@@ -143,39 +143,20 @@ EOF_WSL
 $ErrorActionPreference = 'Stop'
 $distribution = '__DISTRO__'
 $symlinkScript = '__WSL_SCRIPT__'
-$pwsh = Get-Command powershell.exe
-if (-not $pwsh) {
-	Write-Error 'powershell.exe not found.'
-	exit 1
-}
 $wslExe = '__WSL_EXE__'
 if (-not (Test-Path -Path $wslExe)) {
 	Write-Error "wsl.exe not found at $wslExe"
 	exit 1
 }
-$runner = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.ps1')
-$runnerContent = @'
-param()
-$ErrorActionPreference = 'Stop'
-$distribution = '__DISTRO__'
-$symlinkScript = '__WSL_SCRIPT__'
-$wslExe = '__WSL_EXE__'
 $arguments = @('-d', $distribution, '--', '/bin/bash', $symlinkScript)
 Write-Host ('WSL args: {0}' -f ($arguments -join ' '))
-$process = Start-Process -FilePath $wslExe -ArgumentList $arguments -Wait -PassThru
+$process = Start-Process -FilePath $wslExe -ArgumentList $arguments -Verb RunAs -Wait -PassThru
 $exitCode = $process.ExitCode
 if ($exitCode -ne 0) {
 	Write-Host ('Windows symlink setup failed with exit code {0}' -f $exitCode)
 	Read-Host 'Press Enter to close...'
 }
 exit $exitCode
-'@
-[System.IO.File]::WriteAllText($runner, $runnerContent, [System.Text.UTF8Encoding]::new($false))
-Write-Host ('Runner script path: {0}' -f $runner)
-$startArgs = @('-NoLogo','-NoProfile','-ExecutionPolicy','Bypass','-File',$runner)
-$process = Start-Process -FilePath $pwsh.Source -ArgumentList $startArgs -Verb RunAs -WindowStyle Normal -PassThru -Wait
-Remove-Item -Force $runner -ErrorAction SilentlyContinue
-exit $process.ExitCode
 EOF_PS
 
 	local wsl_exe_win='C:\Windows\System32\wsl.exe'
@@ -196,7 +177,7 @@ PY_PS
 	ps_path=$(wslpath -w "${ps_script}")
 
 	if powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "${ps_path}"; then
-		log "Elevated Windows PowerShell launched. Approve the UAC prompt to finish Windows symlink setup."
+		log "Windows symlink helper launched. Approve the UAC prompt to finish setup."
 	else
 		local ps_status=$?
 		log "Unable to launch elevated Windows PowerShell automatically (exit code: ${ps_status}). Run manually:"

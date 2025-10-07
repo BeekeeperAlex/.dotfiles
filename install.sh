@@ -81,20 +81,14 @@ set -euo pipefail
 trap 'rm -f "\$0"' EXIT
 cd ${repo_quoted}
 ./create-symlinks.sh --windows-only
-status=\$?
-if [[ -e /dev/tty ]]; then
-	printf '\nWindows symlink setup exited with code %s. Press Enter to close...' "\$status" >/dev/tty
-	read -r _ </dev/tty
-else
-	printf 'Windows symlink setup exited with code %s\n' "\$status"
-	sleep 5
-fi
-exit "\$status"
+exit "\$?"
 EOF_WSL
 	chmod +x "${wsl_script}"
 
 	local wsl_script_ps
 	wsl_script_ps=$(printf '%s' "${wsl_script}" | sed "s/'/''/g")
+	local distribution_ps
+	distribution_ps=$(printf '%s' "${WSL_DISTRO_NAME}" | sed "s/'/''/g")
 
 	local ps_tmp
 	ps_tmp="$(mktemp)"
@@ -102,36 +96,55 @@ EOF_WSL
 
 	cat >"${ps_script}" <<'EOF_PS'
 $ErrorActionPreference = 'Stop'
-$distribution = '__DISTRIBUTION__'
-$wslScript = '__WSL_SCRIPT__'
+$distribution = '__DISTRO__'
+$symlinkScript = '__WSL_SCRIPT__'
 $pwsh = Get-Command powershell.exe
 if (-not $pwsh) {
 	Write-Error 'powershell.exe not found.'
 	exit 1
 }
-$wslCommand = "wsl.exe -d $distribution -- /bin/bash `"$wslScript`""
-$pwshArgs = @(
-	'-NoLogo',
-	'-NoProfile',
-	'-NoExit',
-	'-Command',
-	$wslCommand
-)
-Write-Host "Launching elevated Windows PowerShell with:`n  $wslCommand"
-Start-Process -FilePath $pwsh.Source -ArgumentList $pwshArgs -Verb RunAs -WindowStyle Normal | Out-Null
+$wslExe = '__WSL_EXE__'
+if (-not (Test-Path -Path $wslExe)) {
+	Write-Error "wsl.exe not found at $wslExe"
+	exit 1
+}
+$runner = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.ps1')
+$runnerContent = @'
+param()
+$ErrorActionPreference = 'Stop'
+$distribution = '__DISTRO__'
+$symlinkScript = '__WSL_SCRIPT__'
+$wslExe = '__WSL_EXE__'
+$arguments = @('-d', $distribution, '--', '/bin/bash', $symlinkScript)
+Write-Host ('WSL args: {0}' -f ($arguments -join ' '))
+$process = Start-Process -FilePath $wslExe -ArgumentList $arguments -Wait -PassThru
+$exitCode = $process.ExitCode
+if ($exitCode -ne 0) {
+	Write-Host ('Windows symlink setup failed with exit code {0}' -f $exitCode)
+	Read-Host 'Press Enter to close...'
+}
+exit $exitCode
+'@
+[System.IO.File]::WriteAllText($runner, $runnerContent, [System.Text.UTF8Encoding]::new($false))
+Write-Host ('Runner script path: {0}' -f $runner)
+$startArgs = @('-NoLogo','-NoProfile','-ExecutionPolicy','Bypass','-File',$runner)
+$process = Start-Process -FilePath $pwsh.Source -ArgumentList $startArgs -Verb RunAs -WindowStyle Normal -PassThru -Wait
+Remove-Item -Force $runner -ErrorAction SilentlyContinue
+exit $process.ExitCode
 EOF_PS
 
-	DISTRIBUTION="${WSL_DISTRO_NAME}" \
-	WSL_SCRIPT_PS="${wsl_script_ps}" \
-	PS_SCRIPT="${ps_script}" \
-	python - <<'PY_PS'
+	local wsl_exe_win='C:\Windows\System32\wsl.exe'
+	local wsl_exe_ps=${wsl_exe_win//\/\\}
+
+	DISTRIBUTION="${distribution_ps}" 	WSL_SCRIPT_PS="${wsl_script_ps}" 	WSL_EXE_PS="${wsl_exe_ps}" 	PS_SCRIPT="${ps_script}" 	python - <<'PY_PS'
 import os
 from pathlib import Path
-path = Path(os.environ['PS_SCRIPT'])
-text = path.read_text()
-text = text.replace('__DISTRIBUTION__', os.environ['DISTRIBUTION'])
+ps_path = Path(os.environ['PS_SCRIPT'])
+text = ps_path.read_text()
+text = text.replace('__DISTRO__', os.environ['DISTRIBUTION'])
 text = text.replace('__WSL_SCRIPT__', os.environ['WSL_SCRIPT_PS'])
-path.write_text(text)
+text = text.replace('__WSL_EXE__', os.environ['WSL_EXE_PS'])
+ps_path.write_text(text)
 PY_PS
 
 	local ps_path
@@ -140,13 +153,15 @@ PY_PS
 	if powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "${ps_path}"; then
 		log "Elevated Windows PowerShell launched. Approve the UAC prompt to finish Windows symlink setup."
 	else
-		log "Unable to launch elevated Windows PowerShell automatically. Run manually:"
+		local ps_status=$?
+		log "Unable to launch elevated Windows PowerShell automatically (exit code: ${ps_status}). Run manually:"
 		log "  wsl.exe -d ${WSL_DISTRO_NAME} -- bash -lc 'cd ${REPO_ROOT} && ./create-symlinks.sh --windows-only'"
 		rm -f "${wsl_script}"
 	fi
 
 	rm -f "${ps_script}"
 }
+
 
 
 

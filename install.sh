@@ -384,10 +384,6 @@ if command_exists gh; then
 			log "GitHub CLI authentication skipped or failed. Continuing without it."
 		fi
 	fi
-	if ! gh copilot -v >/dev/null 2>&1; then
-		log "Installing GitHub Copilot CLI extension"
-		gh extension install github/gh-copilot --force || log "Failed to install GitHub Copilot CLI extension."
-	fi
 	log "Upgrading GitHub CLI extensions"
 	gh extension upgrade --all || log "Failed to upgrade GitHub CLI extensions. Continuing."
 else

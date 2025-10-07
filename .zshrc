@@ -72,12 +72,6 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 # typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND="#FF6AC1"
 # typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND="#FF5c57"
 
-# If gh-copilot is installed then configure its default aliases.
-# ghcs - Github Copilot Suggest
-# ghce - Github Copilot Explain
-# Generated with `gh copilot alias -- zsh`
-gh copilot -v &> /dev/null && source "$HOME/.dotfiles/copilot-aliases.zsh"
-
 # If homebrew is installed then source zsh plugins from their brew locations.
 # Otherwise source from their default locations.
 if command -v brew &> /dev/null; then

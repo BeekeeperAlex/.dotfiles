@@ -51,7 +51,6 @@ done
 files=(
 	"$HOME/.config/nvim:$DOTFILES_DIR/nvim"
 	"$HOME/.config/wezterm:$DOTFILES_DIR/wezterm"
-	"$HOME/.config/gh-copilot/config.yml:$DOTFILES_DIR/gh-copilot/config.yml"
 	"$HOME/.gitconfig:$DOTFILES_DIR/.gitconfig"
 	"$HOME/.p10k.zsh:$DOTFILES_DIR/.p10k.zsh"
 	"$HOME/.wezterm.lua:$DOTFILES_DIR/.wezterm.lua"

@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 
 - Dotfiles root uses scripts `create-symlinks.sh`, `install-arch.sh`, `devenv.sh`, `nvim.sh` to bootstrap Linux, WSL, and containerized workflows.
-- Editor configs live in `nvim/` (LazyVim-based Lua modules) and `wezterm/` (terminal profiles and color schemes). Auxiliary configs sit in `komorebi/` and `gh-copilot/`.
+- Editor configs live in `nvim/` (LazyVim-based Lua modules) and `wezterm/` (terminal profiles and color schemes). Auxiliary configs sit in `komorebi/`.
 - Assets are under `images/`; helper binaries land in `bin/`. Root-level config files (`.zshrc`, `.wezterm.lua`, `.gitconfig`) mirror their home-directory targets.
 
 ## Build, Test, and Development Commands

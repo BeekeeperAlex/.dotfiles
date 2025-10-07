@@ -31,14 +31,59 @@ require_command() {
 	fi
 }
 
+trap_add() {
+	local new_cmd="$1"
+	local signal="${2:-EXIT}"
+	local current_trap
+	current_trap="$(trap -p "$signal")"
+	if [[ -n "$current_trap" ]]; then
+		current_trap="${current_trap#*\'}"
+		current_trap="${current_trap%\'*}"
+		new_cmd="${current_trap};${new_cmd}"
+	fi
+	trap "$new_cmd" "$signal"
+}
+
+stop_sudo_keepalive() {
+	if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then
+		kill "${SUDO_KEEPALIVE_PID}" >/dev/null 2>&1 || true
+		wait "${SUDO_KEEPALIVE_PID}" 2>/dev/null || true
+		unset SUDO_KEEPALIVE_PID
+	fi
+}
+
+start_sudo_keepalive() {
+	if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then
+		return
+	fi
+	if ! command_exists sudo; then
+		return
+	fi
+	if ! sudo -n true >/dev/null 2>&1; then
+		return
+	fi
+	local parent_pid="$$"
+	(
+		while kill -0 "$parent_pid" >/dev/null 2>&1; do
+			sleep 60
+			sudo -n true >/dev/null 2>&1 || exit
+		done
+	) &
+	SUDO_KEEPALIVE_PID=$!
+	trap_add 'stop_sudo_keepalive' EXIT
+}
+
 confirm_sudo() {
 	if ! command_exists sudo; then
 		fail "sudo is required. Please install sudo and rerun."
 	fi
 	if ! sudo -n true >/dev/null 2>&1; then
 		log "sudo access is required. You may be prompted for your password."
-		sudo true
 	fi
+	if ! sudo -v; then
+		fail "Unable to obtain sudo credentials."
+	fi
+	start_sudo_keepalive
 }
 
 ensure_network() {
@@ -200,7 +245,7 @@ ensure_network
 
 log "Installing WezTerm terminfo"
 tempfile="$(mktemp)"
-trap 'rm -f "$tempfile"' EXIT
+trap_add 'rm -f "$tempfile"' EXIT
 if command_exists curl; then
 	curl -fsSL -o "$tempfile" https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo
 elif command_exists wget; then
@@ -210,7 +255,6 @@ else
 fi
 /usr/bin/tic -x -o "$HOME/.terminfo" "$tempfile"
 rm -f "$tempfile"
-trap - EXIT
 
 if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
 	log "Linking dotfiles (WSL Linux side)"

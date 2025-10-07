@@ -23,93 +23,12 @@ check_last_run() {
 }
 
 updoot() {
-	echo "Updating system packages..."
-
-	if command -v apt-get &> /dev/null; then
-		sudo apt-get update -y
-		sudo apt-get upgrade -y
-		sudo apt-get autoremove -y
-		sudo apt-get clean
-	fi
-
-	# If brew is installed then update and upgrade.
-	if command -v brew &> /dev/null; then
-		brew update -v
-		brew upgrade -v
-		brew cleanup -s --prune=all
-	fi
-
-	echo "System packages have been updated."
-
-	echo "Updating Github CLI..."
-
-	# If gh is installed and not authenticated then ask user to authenticate.
-	if command -v gh &> /dev/null && ! gh auth status &> /dev/null ; then
-		echo "Github CLI is installed but not authenticated."
-		gh auth login --web -h github.com
-	fi
-
-	# If gh is installed, authenticated, and copilot CLI is not installed then install it.
-	if command -v gh &> /dev/null && gh auth status &> /dev/null && ! gh copilot -v &> /dev/null ; then
-		gh extension install github/gh-copilot --force
-	fi
-
-	# If gh is installed then update its extensions.
-	command -v gh &> /dev/null && gh extension upgrade --all
-
-	echo "Github CLI has been updated."
-
-	# Ensure mise-managed runtimes are up to date.
-	if command -v mise &> /dev/null; then
-		echo "Updating mise runtimes..."
-		mise install
-		mise upgrade
-		mise doctor || echo "mise doctor reported issues; see output above." >&2
-	fi
-
-	if command -v npm &> /dev/null; then
-		echo "Refreshing global coding agents..."
-		npm install -g @openai/codex @just-every/code
-	fi
-
-	# Updating Neovim nightly.
-	echo "Updating Neovim nightly..."
-	if [[ -d "$NEOVIM_SRC_DIR/.git" ]]; then
-		pushd "$NEOVIM_SRC_DIR" > /dev/null || { echo "Error: unable to change directory to $NEOVIM_SRC_DIR." >&2; exit 1; }
-		old_commit=$(git rev-parse HEAD)
-		git pull --ff-only
-		new_commit=$(git rev-parse HEAD)
-		if [ "$old_commit" != "$new_commit" ]; then
-			echo "New commits detected. Building..."
-			export CMAKE_GENERATOR=Ninja
-			export DEPS_CMAKE_GENERATOR=Ninja
-			export CMAKE_MAKE_PROGRAM="$(command -v ninja)"
-			rm -rf build .deps
-			cmake -S cmake.deps -B .deps -G Ninja
-			cmake --build .deps
-			cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
-			cmake --build build
-			sudo cmake --install build
-			echo "...done!"
-		else
-			echo "Already up-to-date."
-		fi
-		popd > /dev/null || { echo "Error: unable to return to the previous directory." >&2; exit 1; }
+	echo "Running dotfiles installer for maintenance..."
+	if "$HOME/.dotfiles/install.sh"; then
+		echo "Maintenance run completed."
 	else
-		echo "Neovim source directory not found at $NEOVIM_SRC_DIR. Skipping Neovim update."
+		echo "Dotfiles installer reported an error; check logs above." >&2
 	fi
-
-	if command -v nvim &> /dev/null; then
-		echo "Priming Neovim plugins (Lazy sync, MasonUpdate, TSUpdateSync)..."
-		if ! nvim --headless "+Lazy! sync" "+MasonUpdate" "+TSUpdateSync" +qa; then
-			echo "Failed to prime Neovim plugins." >&2
-		else
-			echo "Neovim plugins primed."
-		fi
-	fi
-
-	# Update the timestamp file
-	touch "$TIMESTAMP_FILE"
 }
 
 # Check if we should run system updates.

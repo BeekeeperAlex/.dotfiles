@@ -105,6 +105,127 @@ ensure_network() {
 	fail "Neither curl nor wget is available for network checks. Please install curl and rerun."
 }
 
+windows_symlinks_up_to_date() {
+	if [[ -z "${WSL_DISTRO_NAME:-}" ]]; then
+		return 0
+	fi
+
+	if ! command_exists powershell.exe; then
+		return 1
+	fi
+
+	local dotfiles_dir="${HOME}/.dotfiles"
+	local wezterm_config_target
+	local wezterm_dir_target
+	local nvim_config_target
+
+	if ! wezterm_config_target=$(wslpath -w "${dotfiles_dir}/.wezterm.lua" 2>/dev/null); then
+		return 1
+	fi
+	if ! wezterm_dir_target=$(wslpath -w "${dotfiles_dir}/wezterm" 2>/dev/null); then
+		return 1
+	fi
+	if ! nvim_config_target=$(wslpath -w "${dotfiles_dir}/nvim" 2>/dev/null); then
+		return 1
+	fi
+
+	local ps_tmp
+	ps_tmp="$(mktemp)"
+	local ps_script="${ps_tmp}.ps1"
+
+cat >"${ps_script}" <<'EOF_PS'
+param(
+   [string]$WeztermConfigTarget,
+   [string]$WeztermDirTarget,
+   [string]$NvimConfigTarget
+)
+
+$ErrorActionPreference = 'Stop'
+$needsUpdate = $false
+
+function Normalize-Target {
+   param([string]$Path)
+
+   if ($null -eq $Path) {
+      return $null
+   }
+
+   if ($Path.StartsWith('UNC\', [System.StringComparison]::OrdinalIgnoreCase)) {
+      $Path = '\\' + $Path.Substring(4)
+   }
+
+   return $Path.TrimEnd('\')
+}
+
+function Check-Link {
+   param(
+      [string]$Name,
+      [string]$LinkPath,
+      [string]$ExpectedTarget
+   )
+
+   if (-not (Test-Path -LiteralPath $LinkPath)) {
+      Write-Host ("Missing symlink: {0}" -f $Name)
+      $script:needsUpdate = $true
+      return
+   }
+
+   $item = Get-Item -LiteralPath $LinkPath -Force
+   if (-not ($item.PSObject.Properties.Name -contains 'Target')) {
+      Write-Host ("Unable to determine target for {0}" -f $Name)
+      $script:needsUpdate = $true
+      return
+   }
+
+   $target = $item.Target
+   if ($null -eq $target) {
+      Write-Host ("Null target for {0}" -f $Name)
+      $script:needsUpdate = $true
+      return
+   }
+
+   if ($target -is [Array]) {
+      $target = $target[0]
+   }
+
+   $normalizedActual = Normalize-Target $target
+   $normalizedExpected = Normalize-Target $ExpectedTarget
+
+   if (-not [string]::Equals($normalizedActual, $normalizedExpected, [System.StringComparison]::OrdinalIgnoreCase)) {
+      Write-Host ("Target mismatch for {0}. Current: {1}" -f $Name, $target)
+      $script:needsUpdate = $true
+   }
+}
+
+$weztermConfigLink = Join-Path $env:USERPROFILE '.wezterm.lua'
+$weztermDirLink = Join-Path $env:USERPROFILE '.wezterm'
+$nvimConfigLink = Join-Path $env:LOCALAPPDATA 'nvim'
+
+Check-Link 'WezTerm config file' $weztermConfigLink $WeztermConfigTarget
+Check-Link 'WezTerm directory' $weztermDirLink $WeztermDirTarget
+Check-Link 'Neovim config directory' $nvimConfigLink $NvimConfigTarget
+
+if ($needsUpdate) {
+   exit 1
+}
+
+exit 0
+EOF_PS
+
+	local ps_path
+	ps_path=$(wslpath -w "${ps_script}")
+
+	if powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "${ps_path}" "${wezterm_config_target}" "${wezterm_dir_target}" "${nvim_config_target}"; then
+		rm -f "${ps_script}"
+		rm -f "${ps_tmp}"
+		return 0
+	fi
+
+	rm -f "${ps_script}"
+	rm -f "${ps_tmp}"
+	return 1
+}
+
 launch_windows_symlink_terminal() {
 	if [[ -z "${WSL_DISTRO_NAME:-}" ]]; then
 		return
@@ -112,6 +233,11 @@ launch_windows_symlink_terminal() {
 
 	if ! command_exists powershell.exe; then
 		log "powershell.exe not found; skipping elevated Windows symlink helper."
+		return
+	fi
+
+	if windows_symlinks_up_to_date; then
+		log "Windows symlinks already configured; skipping elevated helper."
 		return
 	fi
 

@@ -3,6 +3,20 @@ set -euo pipefail
 
 NEOVIM_SRC_DIR="${HOME}/.cache/neovim"
 UPDATE_TIMESTAMP_FILE="${HOME}/.last_update_check"
+NEOVIM_SOURCE_MESSAGE=""
+
+COLOR_RESET=$'\033[0m'
+COLOR_GREEN=$'\033[32m'
+COLOR_RED=$'\033[31m'
+COLOR_BLUE=$'\033[34m'
+COLOR_ENABLED=0
+if [[ -z "${NO_COLOR:-}" ]]; then
+	if [[ -n "${FORCE_COLOR:-}" || -n "${CLICOLOR_FORCE:-}" ]]; then
+		COLOR_ENABLED=1
+	elif [[ -t 1 ]]; then
+		COLOR_ENABLED=1
+	fi
+fi
 
 SCRIPT_SOURCE="${BASH_SOURCE[0]}"
 while [[ -h "$SCRIPT_SOURCE" ]]; do
@@ -14,6 +28,163 @@ REPO_ROOT="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
 
 log() {
 	printf '\n[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$@"
+}
+
+supports_tty_progress() {
+	[[ -t 1 ]] && [[ -z "${CI:-}" ]]
+}
+
+use_color() {
+	(( COLOR_ENABLED ))
+}
+
+format_step_tag() {
+	local __var="$1"
+	local kind="$2"
+	local text
+	local color=""
+	case "$kind" in
+		start)
+			text='==>'
+			color="$COLOR_BLUE"
+			;;
+		done)
+			text='[DONE]'
+			color="$COLOR_GREEN"
+			;;
+		fail)
+			text='[FAIL]'
+			color="$COLOR_RED"
+			;;
+		*)
+			text="$kind"
+			;;
+	esac
+	if use_color && [[ -n "$color" ]]; then
+		printf -v "$__var" '%s%s%s' "$color" "$text" "$COLOR_RESET"
+	else
+		printf -v "$__var" '%s' "$text"
+	fi
+}
+
+collapse_progress_line() {
+	local title="$1"
+	local displayed="$2"
+	local status="$3"
+	local tag
+	if (( status == 0 )); then
+		format_step_tag tag done
+	else
+		format_step_tag tag fail
+	fi
+	local move_lines=$((displayed + 1))
+	printf '\033[%dF' "$move_lines"
+	printf '\033[2K\033[J'
+	printf '\r%s %s\n' "$tag" "$title"
+	if (( status != 0 )); then
+		printf '\n'
+	fi
+}
+
+run_step_internal() {
+	local title="$1"
+	shift
+	local log_file
+	log_file="$(mktemp -t install-step.XXXX.log)"
+	local status=0
+	local use_progress=0
+	local fifo=""
+	local count_file=""
+	local reader_pid=""
+	local displayed=0
+	local max_lines="${PROGRESS_WINDOW_LINES:-5}"
+
+	if supports_tty_progress; then
+		use_progress=1
+		fifo="$(mktemp -u)"
+		mkfifo "$fifo"
+		count_file="$(mktemp -t install-step.XXXX.count)"
+		local start_tag
+		format_step_tag start_tag start
+		printf '%s %s\n' "$start_tag" "$title"
+		(
+			trap 'printf "\033[?25h"' EXIT
+			exec 3>"$count_file"
+			local -a buffer=()
+			local line
+			local clear_line=$'\033[2K'
+			local hide_cursor=$'\033[?25l'
+			printf '%s' "$hide_cursor"
+			while IFS= read -r line || [[ -n "$line" ]]; do
+				line="${line//$'\r'/}"
+				printf '%s\n' "$line" >>"$log_file"
+				buffer+=("$line")
+				if (( ${#buffer[@]} > max_lines )); then
+					buffer=("${buffer[@]: -max_lines}")
+				fi
+				if (( displayed > 0 )); then
+					printf '\033[%dF' "$displayed"
+				fi
+				displayed=${#buffer[@]}
+				for entry in "${buffer[@]}"; do
+					printf '%s\r%s\n' "$clear_line" "$entry"
+				done
+			done
+			printf '%d\n' "$displayed" >&3
+		) <"$fifo" &
+		reader_pid=$!
+		set +e
+		"$@" >"$fifo" 2>&1
+		status=$?
+		set -e
+		wait "$reader_pid" 2>/dev/null || true
+		if [[ -f "$count_file" ]]; then
+			if ! read -r displayed <"$count_file"; then
+				displayed=0
+			fi
+		fi
+		rm -f "$fifo" "$count_file"
+	else
+		local start_tag
+		format_step_tag start_tag start
+		printf '%s %s\n' "$start_tag" "$title"
+		set +e
+		"$@" 2>&1 | tee "$log_file"
+		status=${PIPESTATUS[0]}
+		set -e
+	fi
+
+	if (( use_progress )); then
+		collapse_progress_line "$title" "$displayed" "$status"
+	elif (( status == 0 )); then
+		local done_tag
+		format_step_tag done_tag done
+		printf '%s %s\n' "$done_tag" "$title"
+	else
+		local fail_tag
+		format_step_tag fail_tag fail
+		printf '%s %s\n' "$fail_tag" "$title"
+	fi
+
+	if (( status != 0 )); then
+		cat "$log_file"
+		rm -f "$log_file"
+		return "$status"
+	fi
+
+	rm -f "$log_file"
+	return 0
+}
+
+run_step() {
+	local title="$1"
+	shift
+	if (( $# == 0 )); then
+		fail "run_step requires a command to execute"
+	fi
+	if ! run_step_internal "$title" "$@"; then
+		exit 1
+	fi
 }
 
 fail() {
@@ -317,6 +488,114 @@ PY_PS
 
 
 
+install_terminfo() {
+	local tempfile
+	tempfile="$(mktemp)"
+	trap 'tmp="${tempfile:-}"; [[ -n "$tmp" ]] && rm -f "$tmp"' RETURN
+	if command_exists curl; then
+		curl -fsSL -o "$tempfile" https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo
+	elif command_exists wget; then
+		wget -q -O "$tempfile" https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo
+	else
+		fail "Neither curl nor wget is available to download WezTerm terminfo."
+	fi
+	/usr/bin/tic -x -o "$HOME/.terminfo" "$tempfile"
+}
+
+link_dotfiles() {
+	(
+		cd "$REPO_ROOT"
+		bash "./create-symlinks.sh" "$@"
+	)
+}
+
+brew_taps() {
+	brew tap jesseduffield/lazygit >/dev/null
+	brew tap oven-sh/bun >/dev/null
+	brew tap wez/wezterm-linuxbrew >/dev/null
+}
+
+brew_cleanup_all() {
+	brew cleanup -s --prune=all --verbose
+}
+
+brew_upgrade_casks() {
+	brew upgrade --cask --verbose 2>/dev/null || true
+}
+
+gh_extension_upgrade_all() {
+	gh extension upgrade --all || log "Failed to upgrade GitHub CLI extensions. Continuing."
+}
+
+mise_use_global() {
+	mise use -g "$1"
+}
+
+mise_install_all() {
+	mise install
+	mise upgrade
+}
+
+mise_doctor_check() {
+	if ! mise doctor; then
+		printf 'mise doctor reported issues. Please resolve them and rerun.\n' >&2
+		return 1
+	fi
+}
+
+npm_install_agents() {
+	npm install -g "$@"
+}
+
+npm_update_agents() {
+	npm update -g "$@" || log "npm update for coding agents failed; continuing."
+}
+
+sync_neovim_sources() {
+	NEOVIM_SOURCE_MESSAGE=""
+	neovim_build_needed=1
+	prev_commit=""
+	new_commit=""
+	if [[ -d "${NEOVIM_SRC_DIR}/.git" ]]; then
+		if ! prev_commit="$(git -C "${NEOVIM_SRC_DIR}" rev-parse HEAD 2>/dev/null)"; then
+			prev_commit=""
+		fi
+		git -C "${NEOVIM_SRC_DIR}" fetch --tags --prune --force
+		git -C "${NEOVIM_SRC_DIR}" reset --hard origin/master
+		new_commit="$(git -C "${NEOVIM_SRC_DIR}" rev-parse HEAD)"
+		if [[ -n "$prev_commit" && "$prev_commit" == "$new_commit" ]]; then
+			neovim_build_needed=0
+			NEOVIM_SOURCE_MESSAGE="Neovim source already at ${new_commit}; skipping rebuild/install."
+		else
+			NEOVIM_SOURCE_MESSAGE="Neovim source updated to ${new_commit} (was ${prev_commit:-unknown}); rebuilding."
+		fi
+	else
+		rm -rf "${NEOVIM_SRC_DIR}"
+		git clone https://github.com/neovim/neovim.git "${NEOVIM_SRC_DIR}"
+		new_commit="$(git -C "${NEOVIM_SRC_DIR}" rev-parse HEAD)"
+		NEOVIM_SOURCE_MESSAGE="Cloned Neovim sources at ${new_commit}; building."
+	fi
+}
+
+neovim_build_from_source() {
+	require_command ninja "'ninja' not found; install it via Homebrew (brew install ninja) or system packages."
+	require_command cmake "'cmake' not found; install it via Homebrew (brew install cmake) or system packages."
+	pushd "${NEOVIM_SRC_DIR}" >/dev/null
+	export CMAKE_GENERATOR=Ninja
+	export DEPS_CMAKE_GENERATOR=Ninja
+	export CMAKE_MAKE_PROGRAM="$(command -v ninja)"
+	rm -rf build .deps
+	cmake -S cmake.deps -B .deps -G Ninja
+	cmake --build .deps
+	cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+	cmake --build build
+	sudo cmake --install build
+	popd >/dev/null
+	if [[ "$platform" == "ubuntu" ]]; then
+		sudo ldconfig
+	fi
+}
+
 bootstrap_neovim() {
 	if ! command_exists nvim; then
 		log "Skipping Neovim bootstrap. 'nvim' not found in PATH."
@@ -350,26 +629,13 @@ log "Running bootstrap on ${platform}."
 confirm_sudo
 ensure_network
 
-log "Installing WezTerm terminfo"
-tempfile="$(mktemp)"
-trap_add 'rm -f "$tempfile"' EXIT
-if command_exists curl; then
-	curl -fsSL -o "$tempfile" https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo
-elif command_exists wget; then
-	wget -q -O "$tempfile" https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo
-else
-	fail "Neither curl nor wget is available to download WezTerm terminfo."
-fi
-/usr/bin/tic -x -o "$HOME/.terminfo" "$tempfile"
-rm -f "$tempfile"
+run_step "Install WezTerm terminfo" install_terminfo
 
 if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
-	log "Linking dotfiles (WSL Linux side)"
-	(cd "$REPO_ROOT" && bash "./create-symlinks.sh" --posix-only)
+	run_step "Link dotfiles (WSL Linux side)" link_dotfiles --posix-only
 	launch_windows_symlink_terminal
 else
-	log "Linking dotfiles"
-	(cd "$REPO_ROOT" && bash "./create-symlinks.sh")
+	run_step "Link dotfiles" link_dotfiles
 fi
 
 if [[ "$platform" == "macos" ]]; then
@@ -382,12 +648,9 @@ if [[ "$platform" == "macos" ]]; then
 		done
 	fi
 else
-	log "Refreshing apt repositories"
-	sudo apt-get update -y
-	log "Upgrading apt packages"
-	sudo apt-get upgrade -y
-	log "Installing Ubuntu prerequisites"
-	sudo apt-get install -y --no-install-recommends \
+	run_step "Refresh apt repositories" sudo apt-get update -y
+	run_step "Upgrade apt packages" sudo apt-get upgrade -y
+	run_step "Install Ubuntu prerequisites" sudo apt-get install -y --no-install-recommends \
 		build-essential \
 		cmake \
 		ca-certificates \
@@ -398,8 +661,8 @@ else
 		sudo \
 		tzdata \
 		unzip
-	sudo apt-get autoremove -y
-	sudo apt-get clean
+	run_step "Apt autoremove" sudo apt-get autoremove -y
+	run_step "Apt clean" sudo apt-get clean
 fi
 
 log "Bootstrapping Homebrew"
@@ -423,16 +686,11 @@ if ! command_exists brew; then
 	fail "Homebrew shellenv did not expose brew at ${BREW_BIN}. Please check the installation."
 fi
 
-log "Ensuring brew taps"
-brew tap jesseduffield/lazygit >/dev/null
-brew tap oven-sh/bun >/dev/null
-brew tap wez/wezterm-linuxbrew >/dev/null
-
-log "Updating brew"
-brew update --verbose
-brew upgrade --formula --verbose
-brew upgrade --cask --verbose 2>/dev/null || true
-brew cleanup -s --prune=all --verbose
+run_step "Ensure brew taps" brew_taps
+run_step "brew update" brew update --verbose
+run_step "brew upgrade (formula)" brew upgrade --formula --verbose
+run_step "brew upgrade (cask)" brew_upgrade_casks
+run_step "brew cleanup" brew_cleanup_all
 
 brew_formulae=(
 	azure-cli
@@ -471,16 +729,15 @@ if [[ "$platform" == "ubuntu" ]]; then
 	brew_formulae+=(llvm)
 fi
 
-log "Installing brew packages"
-brew install "${brew_formulae[@]}"
+run_step "Install brew packages" brew install "${brew_formulae[@]}"
 
 log "Cloning fzf-git"
 if [[ -d "$HOME/.fzf-git/.git" ]]; then
-	git -C "$HOME/.fzf-git" pull --ff-only
+	run_step "Update fzf-git" git -C "$HOME/.fzf-git" pull --ff-only
 elif [[ -d "$HOME/.fzf-git" ]]; then
 	log "Existing ~/.fzf-git directory without git found. Skipping clone."
 else
-	git clone https://github.com/junegunn/fzf-git.sh.git "$HOME/.fzf-git"
+	run_step "Clone fzf-git" git clone https://github.com/junegunn/fzf-git.sh.git "$HOME/.fzf-git"
 fi
 
 log "Ensuring GitHub CLI configuration"
@@ -491,8 +748,7 @@ if command_exists gh; then
 			log "GitHub CLI authentication skipped or failed. Continuing without it."
 		fi
 	fi
-	log "Upgrading GitHub CLI extensions"
-	gh extension upgrade --all || log "Failed to upgrade GitHub CLI extensions. Continuing."
+	run_step "Upgrade GitHub CLI extensions" gh_extension_upgrade_all
 else
 	log "GitHub CLI not found; skipping GitHub-specific configuration."
 fi
@@ -511,19 +767,14 @@ mise_globals=(
 )
 
 for tool in "${mise_globals[@]}"; do
-	log "Ensuring ${tool} via mise"
-	mise use -g "$tool"
+	run_step "Ensure ${tool} via mise" mise_use_global "$tool"
 done
 
-mise install
-mise upgrade
+run_step "Install/upgrade mise runtimes" mise_install_all
 
 eval "$(mise activate bash)"
 
-log "Running mise doctor"
-if ! mise doctor; then
-	fail "mise doctor reported issues. Please resolve them and rerun."
-fi
+run_step "Run mise doctor" mise_doctor_check
 
 if ! command_exists npm; then
 	fail "npm is not available after mise activation"
@@ -539,61 +790,23 @@ if ! npm list -g @just-every/code >/dev/null 2>&1; then
 fi
 
 if (( ${#needed_agents[@]} > 0 )); then
-	npm install -g "${needed_agents[@]}"
+	run_step "Install global coding agents" npm_install_agents "${needed_agents[@]}"
 else
 	log "Global coding agents already installed; skipping npm install."
-	npm update -g @openai/codex @just-every/code || log "npm update for coding agents failed; continuing."
+	run_step "Update global coding agents" npm_update_agents @openai/codex @just-every/code
 fi
 
 log "Building Neovim from source into ${NEOVIM_SRC_DIR}"
-neovim_build_needed=1
-prev_commit=""
-new_commit=""
-
-if [[ -d "${NEOVIM_SRC_DIR}/.git" ]]; then
-	# Force tag updates (e.g. nightly retag) when fetching Neovim sources
-	if ! prev_commit="$(git -C "${NEOVIM_SRC_DIR}" rev-parse HEAD 2>/dev/null)"; then
-		prev_commit=""
-	fi
-	git -C "${NEOVIM_SRC_DIR}" fetch --tags --prune --force
-	git -C "${NEOVIM_SRC_DIR}" reset --hard origin/master
-	new_commit="$(git -C "${NEOVIM_SRC_DIR}" rev-parse HEAD)"
-
-	if [[ -n "$prev_commit" && "$prev_commit" == "$new_commit" ]]; then
-		log "Neovim source already at ${new_commit}; skipping rebuild/install."
-		neovim_build_needed=0
-	else
-		log "Neovim source updated to ${new_commit} (was ${prev_commit:-unknown}); rebuilding."
-	fi
-else
-	rm -rf "${NEOVIM_SRC_DIR}"
-	git clone https://github.com/neovim/neovim.git "${NEOVIM_SRC_DIR}"
-	new_commit="$(git -C "${NEOVIM_SRC_DIR}" rev-parse HEAD)"
-	log "Cloned Neovim sources at ${new_commit}; building."
+run_step "Sync Neovim sources" sync_neovim_sources
+if [[ -n "$NEOVIM_SOURCE_MESSAGE" ]]; then
+	log "$NEOVIM_SOURCE_MESSAGE"
 fi
 
 if [[ "$neovim_build_needed" == "1" ]]; then
-	require_command ninja "'ninja' not found; install it via Homebrew (brew install ninja) or system packages."
-	require_command cmake "'cmake' not found; install it via Homebrew (brew install cmake) or system packages."
-
-	pushd "${NEOVIM_SRC_DIR}" >/dev/null
-	export CMAKE_GENERATOR=Ninja
-	export DEPS_CMAKE_GENERATOR=Ninja
-	export CMAKE_MAKE_PROGRAM="$(command -v ninja)"
-	rm -rf build .deps
-	cmake -S cmake.deps -B .deps -G Ninja
-	cmake --build .deps
-	cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
-	cmake --build build
-	sudo cmake --install build
-	popd >/dev/null
-
-	if [[ "$platform" == "ubuntu" ]]; then
-		sudo ldconfig
-	fi
+	run_step "Build Neovim from source" neovim_build_from_source
 fi
 
-bootstrap_neovim
+run_step "Prime Neovim plugins" bootstrap_neovim
 
 log "Recording update timestamp"
 touch "$UPDATE_TIMESTAMP_FILE"

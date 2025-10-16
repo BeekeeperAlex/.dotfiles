@@ -5,19 +5,6 @@ NEOVIM_SRC_DIR="${HOME}/.cache/neovim"
 UPDATE_TIMESTAMP_FILE="${HOME}/.last_update_check"
 NEOVIM_SOURCE_MESSAGE=""
 
-COLOR_RESET=$'\033[0m'
-COLOR_GREEN=$'\033[32m'
-COLOR_RED=$'\033[31m'
-COLOR_BLUE=$'\033[34m'
-COLOR_ENABLED=0
-if [[ -z "${NO_COLOR:-}" ]]; then
-	if [[ -n "${FORCE_COLOR:-}" || -n "${CLICOLOR_FORCE:-}" ]]; then
-		COLOR_ENABLED=1
-	elif [[ -t 1 ]]; then
-		COLOR_ENABLED=1
-	fi
-fi
-
 SCRIPT_SOURCE="${BASH_SOURCE[0]}"
 while [[ -h "$SCRIPT_SOURCE" ]]; do
 	SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
@@ -30,160 +17,19 @@ log() {
 	printf '\n[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$@"
 }
 
-supports_tty_progress() {
-	[[ -t 1 ]] && [[ -z "${CI:-}" ]]
-}
-
-use_color() {
-	(( COLOR_ENABLED ))
-}
-
-format_step_tag() {
-	local __var="$1"
-	local kind="$2"
-	local text
-	local color=""
-	case "$kind" in
-		start)
-			text='==>'
-			color="$COLOR_BLUE"
-			;;
-		done)
-			text='[DONE]'
-			color="$COLOR_GREEN"
-			;;
-		fail)
-			text='[FAIL]'
-			color="$COLOR_RED"
-			;;
-		*)
-			text="$kind"
-			;;
-	esac
-	if use_color && [[ -n "$color" ]]; then
-		printf -v "$__var" '%s%s%s' "$color" "$text" "$COLOR_RESET"
-	else
-		printf -v "$__var" '%s' "$text"
-	fi
-}
-
-collapse_progress_line() {
-	local title="$1"
-	local displayed="$2"
-	local status="$3"
-	local tag
-	if (( status == 0 )); then
-		format_step_tag tag done
-	else
-		format_step_tag tag fail
-	fi
-	local move_lines=$((displayed + 1))
-	printf '\033[%dF' "$move_lines"
-	printf '\033[2K\033[J'
-	printf '\r%s %s\n' "$tag" "$title"
-	if (( status != 0 )); then
-		printf '\n'
-	fi
-}
-
-run_step_internal() {
-	local title="$1"
-	shift
-	local log_file
-	log_file="$(mktemp -t install-step.XXXX.log)"
-	local status=0
-	local use_progress=0
-	local fifo=""
-	local count_file=""
-	local reader_pid=""
-	local displayed=0
-	local max_lines="${PROGRESS_WINDOW_LINES:-5}"
-
-	if supports_tty_progress; then
-		use_progress=1
-		fifo="$(mktemp -u)"
-		mkfifo "$fifo"
-		count_file="$(mktemp -t install-step.XXXX.count)"
-		local start_tag
-		format_step_tag start_tag start
-		printf '%s %s\n' "$start_tag" "$title"
-		(
-			trap 'printf "\033[?25h"' EXIT
-			exec 3>"$count_file"
-			local -a buffer=()
-			local line
-			local clear_line=$'\033[2K'
-			local hide_cursor=$'\033[?25l'
-			printf '%s' "$hide_cursor"
-			while IFS= read -r line || [[ -n "$line" ]]; do
-				line="${line//$'\r'/}"
-				printf '%s\n' "$line" >>"$log_file"
-				buffer+=("$line")
-				if (( ${#buffer[@]} > max_lines )); then
-					buffer=("${buffer[@]: -max_lines}")
-				fi
-				if (( displayed > 0 )); then
-					printf '\033[%dF' "$displayed"
-				fi
-				displayed=${#buffer[@]}
-				for entry in "${buffer[@]}"; do
-					printf '%s\r%s\n' "$clear_line" "$entry"
-				done
-			done
-			printf '%d\n' "$displayed" >&3
-		) <"$fifo" &
-		reader_pid=$!
-		set +e
-		"$@" >"$fifo" 2>&1
-		status=$?
-		set -e
-		wait "$reader_pid" 2>/dev/null || true
-		if [[ -f "$count_file" ]]; then
-			if ! read -r displayed <"$count_file"; then
-				displayed=0
-			fi
-		fi
-		rm -f "$fifo" "$count_file"
-	else
-		local start_tag
-		format_step_tag start_tag start
-		printf '%s %s\n' "$start_tag" "$title"
-		set +e
-		"$@" 2>&1 | tee "$log_file"
-		status=${PIPESTATUS[0]}
-		set -e
-	fi
-
-	if (( use_progress )); then
-		collapse_progress_line "$title" "$displayed" "$status"
-	elif (( status == 0 )); then
-		local done_tag
-		format_step_tag done_tag done
-		printf '%s %s\n' "$done_tag" "$title"
-	else
-		local fail_tag
-		format_step_tag fail_tag fail
-		printf '%s %s\n' "$fail_tag" "$title"
-	fi
-
-	if (( status != 0 )); then
-		cat "$log_file"
-		rm -f "$log_file"
-		return "$status"
-	fi
-
-	rm -f "$log_file"
-	return 0
-}
-
 run_step() {
 	local title="$1"
 	shift
 	if (( $# == 0 )); then
 		fail "run_step requires a command to execute"
 	fi
-	if ! run_step_internal "$title" "$@"; then
-		exit 1
+	log "==> ${title}"
+	if "$@"; then
+		log "[DONE] ${title}"
+	else
+		local status=$?
+		log "[FAIL] ${title}"
+		exit "$status"
 	fi
 }
 

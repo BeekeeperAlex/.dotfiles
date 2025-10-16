@@ -154,3 +154,5 @@ alias vi="nvim"
 alias vim="nvim"
 # alias cd="z"
 alias ff="fastfetch"
+
+. "$HOME/.local/bin/env"

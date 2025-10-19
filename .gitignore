@@ -2,3 +2,4 @@
 .config/github-copilot/hosts.json
 node_modules/
 .code/agents/
+.env

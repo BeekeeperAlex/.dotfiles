@@ -369,6 +369,24 @@ brew_upgrade_casks() {
 	brew upgrade --cask --verbose 2>/dev/null || true
 }
 
+install_stripe_cli_ubuntu() {
+	local keyring="/usr/share/keyrings/stripe.gpg"
+	local repo_file="/etc/apt/sources.list.d/stripe.list"
+	local repo_entry="deb [signed-by=${keyring}] https://packages.stripe.dev/stripe-cli-debian-local stable main"
+
+	log "Refreshing Stripe CLI apt signing key"
+	curl -fsSL https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | sudo tee "$keyring" >/dev/null
+
+	if [[ ! -d "/etc/apt/sources.list.d" ]]; then
+		sudo mkdir -p /etc/apt/sources.list.d
+	fi
+
+	echo "$repo_entry" | sudo tee "$repo_file" >/dev/null
+
+	sudo apt-get update -y
+	sudo apt-get install -y stripe
+}
+
 gh_extension_upgrade_all() {
 	gh extension upgrade --all || log "Failed to upgrade GitHub CLI extensions. Continuing."
 }
@@ -389,12 +407,17 @@ mise_doctor_check() {
 	fi
 }
 
-npm_install_agents() {
-	npm install -g "$@"
+bun_install_agents() {
+	bun install --global "$@"
 }
 
-npm_update_agents() {
-	npm update -g "$@" || log "npm update for coding agents failed; continuing."
+bun_update_agents() {
+	bun install --global "$@" || log "bun install for coding agents failed; continuing."
+}
+
+bun_global_has_package() {
+	local package="$1"
+	NO_COLOR=1 bun pm ls --global 2>/dev/null | grep -Fq "${package}@"
 }
 
 sync_neovim_sources() {
@@ -501,12 +524,14 @@ else
 		cmake \
 		ca-certificates \
 		curl \
+		gnupg \
 		file \
 		git \
 		procps \
 		sudo \
 		tzdata \
 		unzip
+	run_step "Install Stripe CLI (apt)" install_stripe_cli_ubuntu
 	run_step "Apt autoremove" sudo apt-get autoremove -y
 	run_step "Apt clean" sudo apt-get clean
 fi
@@ -571,6 +596,10 @@ brew_formulae=(
 	zsh-vi-mode
 )
 
+if [[ "$platform" == "macos" ]]; then
+	brew_formulae+=(stripe/stripe-cli/stripe)
+fi
+
 if [[ "$platform" == "ubuntu" ]]; then
 	brew_formulae+=(llvm)
 fi
@@ -622,25 +651,32 @@ eval "$(mise activate bash)"
 
 run_step "Run mise doctor" mise_doctor_check
 
-if ! command_exists npm; then
-	fail "npm is not available after mise activation"
+if ! command_exists bun; then
+	fail "bun is not available after mise activation"
 fi
 
-log "Installing global coding agents via npm"
-needed_agents=()
-if ! npm list -g @openai/codex >/dev/null 2>&1; then
-	needed_agents+=("@openai/codex")
-fi
-if ! npm list -g @just-every/code >/dev/null 2>&1; then
-	needed_agents+=("@just-every/code")
-fi
+log "Installing global coding agents via Bun"
+agents=(
+	@openai/codex
+	@just-every/code
+)
+missing_agents=()
 
-if (( ${#needed_agents[@]} > 0 )); then
-	run_step "Install global coding agents" npm_install_agents "${needed_agents[@]}"
+for agent in "${agents[@]}"; do
+	if ! bun_global_has_package "$agent"; then
+		missing_agents+=("$agent")
+	fi
+done
+
+if (( ${#missing_agents[@]} > 0 )); then
+	install_args=("${missing_agents[@]/%/@latest}")
+	run_step "Install global coding agents" bun_install_agents "${install_args[@]}"
 else
-	log "Global coding agents already installed; skipping npm install."
-	run_step "Update global coding agents" npm_update_agents @openai/codex @just-every/code
+	log "Global coding agents already installed; skipping bun install."
 fi
+
+update_args=("${agents[@]/%/@latest}")
+run_step "Update global coding agents" bun_update_agents "${update_args[@]}"
 
 log "Building Neovim from source into ${NEOVIM_SRC_DIR}"
 run_step "Sync Neovim sources" sync_neovim_sources
@@ -697,9 +733,9 @@ if [[ "$neovim_build_needed" == "1" ]]; then
 else
 	log "- Neovim install skipped; already at ${new_commit:-unknown}"
 fi
-if (( ${#needed_agents[@]} > 0 )); then
-	log "- Installed npm agents: ${needed_agents[*]}"
+if (( ${#missing_agents[@]} > 0 )); then
+	log "- Installed bun agents via @latest: ${missing_agents[*]}"
 else
-	log "- npm agents already up to date"
+	log "- bun agents refreshed to @latest"
 fi
 log "- Dotfiles bootstrap complete. Please restart your shell."

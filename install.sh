@@ -6,7 +6,7 @@ UPDATE_TIMESTAMP_FILE="${HOME}/.last_update_check"
 NEOVIM_SOURCE_MESSAGE=""
 
 SCRIPT_SOURCE="${BASH_SOURCE[0]}"
-while [[ -h "$SCRIPT_SOURCE" ]]; do
+while [[ -L "$SCRIPT_SOURCE" ]]; do
 	SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
 	SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
 	[[ "$SCRIPT_SOURCE" != /* ]] && SCRIPT_SOURCE="${SCRIPT_DIR}/${SCRIPT_SOURCE}"
@@ -20,7 +20,7 @@ log() {
 run_step() {
 	local title="$1"
 	shift
-	if (( $# == 0 )); then
+	if (($# == 0)); then
 		fail "run_step requires a command to execute"
 	fi
 	log "==> ${title}"
@@ -150,7 +150,7 @@ windows_symlinks_up_to_date() {
 	ps_tmp="$(mktemp)"
 	local ps_script="${ps_tmp}.ps1"
 
-cat >"${ps_script}" <<'EOF_PS'
+	cat >"${ps_script}" <<'EOF_PS'
 param(
    [string]$WeztermConfigTarget,
    [string]$WeztermDirTarget,
@@ -303,9 +303,9 @@ exit $exitCode
 EOF_PS
 
 	local wsl_exe_win='C:\Windows\System32\wsl.exe'
-	local wsl_exe_ps=${wsl_exe_win//\/\\}
+	local wsl_exe_ps=${wsl_exe_win//\/\\/}
 
-	DISTRIBUTION="${distribution_ps}" 	WSL_SCRIPT_PS="${wsl_script_ps}" 	WSL_EXE_PS="${wsl_exe_ps}" 	PS_SCRIPT="${ps_script}" 	python - <<'PY_PS'
+	DISTRIBUTION="${distribution_ps}" WSL_SCRIPT_PS="${wsl_script_ps}" WSL_EXE_PS="${wsl_exe_ps}" PS_SCRIPT="${ps_script}" python - <<'PY_PS'
 import os
 from pathlib import Path
 ps_path = Path(os.environ['PS_SCRIPT'])
@@ -330,9 +330,6 @@ PY_PS
 
 	rm -f "${ps_script}"
 }
-
-
-
 
 install_terminfo() {
 	local tempfile
@@ -479,18 +476,18 @@ bootstrap_neovim() {
 
 platform=""
 case "$(uname -s)" in
-	Darwin)
-		platform="macos"
-		;;
-	Linux)
-		if [[ -f /etc/os-release ]]; then
-			. /etc/os-release
-			if [[ "${ID:-}" == "ubuntu" ]] || [[ "${ID_LIKE:-}" == *ubuntu* ]] || [[ "${ID_LIKE:-}" == *debian* ]]; then
-				platform="ubuntu"
-			fi
+Darwin)
+	platform="macos"
+	;;
+Linux)
+	if [[ -f /etc/os-release ]]; then
+		. /etc/os-release
+		if [[ "${ID:-}" == "ubuntu" ]] || [[ "${ID_LIKE:-}" == *ubuntu* ]] || [[ "${ID_LIKE:-}" == *debian* ]]; then
+			platform="ubuntu"
 		fi
-		;;
-	esac
+	fi
+	;;
+esac
 
 [[ -n "$platform" ]] || fail "Unsupported platform. Only macOS and Ubuntu are supported."
 
@@ -566,6 +563,7 @@ run_step "brew cleanup" brew_cleanup_all
 brew_formulae=(
 	azure-cli
 	bat
+	cairo
 	cmake
 	dotnet
 	eza
@@ -574,11 +572,15 @@ brew_formulae=(
 	fzf
 	gcc
 	gh
+	giflib
 	git-delta
 	go
 	helm
 	gettext
+	jpeg
 	libtool
+	libpng
+	librsvg
 	lazygit
 	lynx
 	mise
@@ -590,6 +592,7 @@ brew_formulae=(
 	tlrc
 	wezterm
 	wordnet
+	pango
 	zoxide
 	zsh
 	powerlevel10k
@@ -601,7 +604,15 @@ if [[ "$platform" == "macos" ]]; then
 fi
 
 if [[ "$platform" == "ubuntu" ]]; then
-	brew_formulae+=(llvm)
+	brew_formulae+=(
+		glew
+		libxext
+		libxi
+		libx11
+		mesa
+		mesa-glu
+		llvm
+	)
 fi
 
 run_step "Install brew packages" brew install "${brew_formulae[@]}"
@@ -668,7 +679,7 @@ for agent in "${agents[@]}"; do
 	fi
 done
 
-if (( ${#missing_agents[@]} > 0 )); then
+if ((${#missing_agents[@]} > 0)); then
 	install_args=("${missing_agents[@]/%/@latest}")
 	run_step "Install global coding agents" bun_install_agents "${install_args[@]}"
 else
@@ -733,7 +744,7 @@ if [[ "$neovim_build_needed" == "1" ]]; then
 else
 	log "- Neovim install skipped; already at ${new_commit:-unknown}"
 fi
-if (( ${#missing_agents[@]} > 0 )); then
+if ((${#missing_agents[@]} > 0)); then
 	log "- Installed bun agents via @latest: ${missing_agents[*]}"
 else
 	log "- bun agents refreshed to @latest"

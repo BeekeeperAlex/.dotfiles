@@ -27,7 +27,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
 	unzip
 
 # Update Neovim plugins.
-RUN nvim --headless "+Lazy! sync" "+sleep 5" +MasonUpdate "+sleep 5" +TSUpdateSync "+sleep 5" +qa
+RUN nvim --headless "+Lazy! sync" "+MasonUpdate" "+TSUpdateSync" +qa
 
 # Setup default entrypoint.
 WORKDIR /root

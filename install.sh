@@ -458,9 +458,6 @@ bootstrap_env_from_1password() {
 
 configure_1password_ssh_agent() {
 	if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
-		if command_exists git; then
-			git config --global core.sshCommand ssh.exe
-		fi
 		return 0
 	fi
 
@@ -477,14 +474,6 @@ configure_1password_ssh_agent() {
 	fi
 
 	ln -snf "$target" "$sock_link"
-
-	if command_exists git; then
-		local current
-		current="$(git config --global core.sshCommand 2>/dev/null || true)"
-		if [[ "$current" == "ssh.exe" ]]; then
-			git config --global --unset core.sshCommand >/dev/null 2>&1 || true
-		fi
-	fi
 
 	return 0
 }

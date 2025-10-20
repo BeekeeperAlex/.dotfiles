@@ -456,8 +456,43 @@ bootstrap_env_from_1password() {
 	return 0
 }
 
+ensure_windows_ssh_directory() {
+	if [[ -z "${WSL_DISTRO_NAME:-}" ]]; then
+		return 0
+	fi
+
+	if ! command_exists powershell.exe; then
+		log "powershell.exe not available; cannot prepare Windows SSH directory."
+		return 0
+	fi
+
+	local win_home
+	win_home="$(powershell.exe -NoProfile -Command "[Environment]::GetFolderPath('UserProfile')" 2>/dev/null | tr -d '\r')"
+	if [[ -z "$win_home" ]]; then
+		log "Unable to resolve Windows user profile; skipping SSH directory preparation."
+		return 0
+	fi
+
+	local wsl_home
+	if ! wsl_home="$(wslpath -u "$win_home" 2>/dev/null)"; then
+		log "wslpath failed to convert Windows profile path (${win_home}); skipping SSH directory preparation."
+		return 0
+	fi
+
+	local ssh_dir="${wsl_home}/.ssh"
+	if [[ ! -d "$ssh_dir" ]]; then
+		mkdir -p "$ssh_dir"
+	fi
+	if [[ ! -f "${ssh_dir}/known_hosts" ]]; then
+		touch "${ssh_dir}/known_hosts"
+	fi
+
+	return 0
+}
+
 configure_1password_ssh_agent() {
 	if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+		ensure_windows_ssh_directory
 		return 0
 	fi
 

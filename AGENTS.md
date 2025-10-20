@@ -41,5 +41,5 @@
 ## 1Password SSH Agent
 
 - Enable the SSH agent inside the 1Password desktop app (macOS, Linux, or Windows) and confirm it lists your keys with `ssh-add -l` before bootstrapping these dotfiles.
-- `install.sh` links `~/.1password/agent.sock` to the platform-specific agent socket so `SSH_AUTH_SOCK` can point at a stable path across macOS and Ubuntu.
-- `.zshrc` exports `SSH_AUTH_SOCK=$HOME/.1password/agent.sock` on macOS/Linux and, on WSL, unsets it while aliasing `ssh`, `ssh-add`, `scp`, and `sftp` (and exporting `GIT_SSH_COMMAND=ssh.exe`) so Git and other tools keep using the Windows 1Password agent.
+- `install.sh` links `~/.1password/agent.sock` to the platform-specific agent socket so `SSH_AUTH_SOCK` can point at a stable path across macOS and Ubuntu, and ensures the Windows `~/.ssh/known_hosts` directory exists for WSL sessions.
+- `.zshrc` exports `SSH_AUTH_SOCK=$HOME/.1password/agent.sock` on macOS/Linux and, on WSL, unsets it while wrapping `ssh`, `scp`, and `sftp` to call their Windows counterparts with `StrictHostKeyChecking=accept-new` and setting `GIT_SSH_COMMAND="ssh.exe -o StrictHostKeyChecking=accept-new"` so the first connection never blocks on host-key prompts.

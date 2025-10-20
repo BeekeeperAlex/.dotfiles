@@ -147,12 +147,22 @@ setopt SHARE_HISTORY
 setup_1password_ssh_agent() {
 	if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
 		if command -v ssh.exe >/dev/null 2>&1; then
-			alias ssh="ssh.exe"
-			alias scp="scp.exe"
-			alias sftp="sftp.exe"
-			alias ssh-add="ssh-add.exe"
-			alias ssh-agent="ssh-agent.exe"
-			export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh.exe}"
+			ssh() {
+				command ssh.exe -o StrictHostKeyChecking=accept-new "$@"
+			}
+			scp() {
+				command scp.exe -o StrictHostKeyChecking=accept-new "$@"
+			}
+			sftp() {
+				command sftp.exe -o StrictHostKeyChecking=accept-new "$@"
+			}
+			ssh-add() {
+				command ssh-add.exe "$@"
+			}
+			ssh-agent() {
+				command ssh-agent.exe "$@"
+			}
+			export GIT_SSH_COMMAND="ssh.exe -o StrictHostKeyChecking=accept-new"
 		fi
 		unset SSH_AUTH_SOCK
 		return

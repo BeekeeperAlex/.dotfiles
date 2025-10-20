@@ -37,3 +37,10 @@
 
 - Never commit personal secrets or machine-specific IDs; use placeholders and document required env vars in `README.md`.
 - Prefer testing destructive commands (package installs, symlink cleanup) inside the Docker images before running on a host system.
+
+## 1Password SSH Agent
+
+- Enable the SSH agent inside the 1Password desktop app (macOS, Linux, or Windows) and confirm it lists your keys with `ssh-add -l` before bootstrapping these dotfiles.citeturn2view0
+- `install.sh` links `~/.1password/agent.sock` to the OS-specific socket so `SSH_AUTH_SOCK` can point at a stable path across macOS and Ubuntu.citeturn1search5
+- `.zshrc` exports `SSH_AUTH_SOCK=$HOME/.1password/agent.sock` on macOS/Linux and unsets it on WSL while aliasing `ssh`, `ssh-add`, `scp`, and `sftp` to their Windows equivalents to use the 1Password agent there.citeturn2view0turn1search5
+- `install.sh` also sets `git config --global core.sshCommand ssh.exe` when running inside WSL, and removes that override on other platforms so Git traffic follows the correct agent automatically.citeturn2view0

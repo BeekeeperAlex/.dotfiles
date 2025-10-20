@@ -144,6 +144,27 @@ SAVEHIST=10000
 HISTSIZE=10000
 setopt SHARE_HISTORY
 
+setup_1password_ssh_agent() {
+	if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+		if command -v ssh.exe >/dev/null 2>&1; then
+			alias ssh="ssh.exe"
+			alias scp="scp.exe"
+			alias sftp="sftp.exe"
+			alias ssh-add="ssh-add.exe"
+			alias ssh-agent="ssh-agent.exe"
+			export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh.exe}"
+		fi
+		unset SSH_AUTH_SOCK
+		return
+	fi
+
+	local sock="$HOME/.1password/agent.sock"
+	if [[ -S "$sock" || ! -e "$sock" ]]; then
+		export SSH_AUTH_SOCK="$sock"
+	fi
+}
+setup_1password_ssh_agent
+
 # Set personal aliases.
 alias cat="bat --paging=never"
 alias help="run-help"

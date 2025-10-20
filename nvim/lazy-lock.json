@@ -2,7 +2,7 @@
   "CopilotChat.nvim": { "branch": "main", "commit": "98435447243eb80a7c228b1447f14f3294d39739" },
   "FixCursorHold.nvim": { "branch": "master", "commit": "1900f89dc17c603eec29960f57c00bd9ae696495" },
   "LazyVim": { "branch": "main", "commit": "16917db94a056fe01b3bac604bc89da4077bd9cd" },
-  "SchemaStore.nvim": { "branch": "main", "commit": "e71cc0607284739892287f6a2d92753999179dcf" },
+  "SchemaStore.nvim": { "branch": "main", "commit": "3171c3a5816e4975ea0a7f4ba6de3d109547c55b" },
   "blink-cmp-dictionary": { "branch": "master", "commit": "43b701fe9728a704bc63e4667c5d8b398bf129b2" },
   "blink-copilot": { "branch": "main", "commit": "5d35fd07fcc148be20442da1bdd2407e03263d7d" },
   "blink-emoji.nvim": { "branch": "master", "commit": "f22ce8cac02a6ece05368220f1e38bd34fe376f9" },

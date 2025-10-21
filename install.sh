@@ -48,7 +48,6 @@ require_command() {
 	fi
 }
 
-
 confirm_sudo() {
 	if ! command_exists sudo; then
 		fail "sudo is required. Please install sudo and rerun."
@@ -366,10 +365,6 @@ install_1password_cli_ubuntu() {
 	sudo apt-get install -y 1password-cli
 }
 
-gh_extension_upgrade_all() {
-	gh extension upgrade --all || log "Failed to upgrade GitHub CLI extensions. Continuing."
-}
-
 mise_use_global() {
 	mise use -g "$1"
 }
@@ -397,63 +392,6 @@ bun_update_agents() {
 bun_global_has_package() {
 	local package="$1"
 	NO_COLOR=1 bun pm ls --global 2>/dev/null | grep -Fq "${package}@"
-}
-
-bootstrap_env_from_1password() {
-	local env_target="${REPO_ROOT}/.env"
-
-	if ! command_exists op; then
-		log "1Password CLI not available; skipping .env generation."
-		return 0
-	fi
-
-	if ! op whoami >/dev/null 2>&1; then
-		log "1Password CLI not authenticated; skipping .env generation."
-		return 0
-	fi
-
-	local tmp_env
-	tmp_env="$(mktemp)"
-
-	local wrote=0
-	local openai_value=""
-	local openai_line=""
-	local openai_item="OPENAI API KEY"
-	local field
-	local field_candidates=("credential" "Credential" "password" "Password" "API Key" "api key" "Key" "key" "Secret" "secret" "Token" "token" "value" "Value" "string" "String" "concealed" "Concealed")
-	for field in "${field_candidates[@]}"; do
-		if openai_value="$(op item get "${openai_item}" --vault "Private" --field "$field" --reveal 2>/dev/null)"; then
-			openai_value="${openai_value%$'\n'}"
-			openai_value="${openai_value%$'\r'}"
-			if [[ -n "$openai_value" ]]; then
-				local openai_escaped="${openai_value//\\/\\\\}"
-				openai_escaped="${openai_escaped//\"/\\\"}"
-				openai_line="OPENAI_API_KEY=\"${openai_escaped}\""
-				printf '%s\n' "$openai_line" >>"$tmp_env"
-				wrote=1
-				break
-			fi
-		fi
-		openai_value=""
-	done
-	if ((wrote == 0)); then
-		log "Unable to read OPENAI_API_KEY from 1Password item ${openai_item}."
-	fi
-
-	if ((wrote)); then
-		mv "$tmp_env" "$env_target"
-		tmp_env=""
-		log "Wrote .env from 1Password secrets."
-	else
-		rm -f "$tmp_env"
-		tmp_env=""
-	fi
-
-	if [[ -n "$tmp_env" ]]; then
-		rm -f "$tmp_env"
-	fi
-
-	return 0
 }
 
 ensure_windows_ssh_directory() {
@@ -565,7 +503,7 @@ bootstrap_neovim() {
 	fi
 
 	log "Priming Neovim plugins (Lazy sync, MasonUpdate, TSUpdateSync)"
-	if ! nvim --headless "+Lazy! sync" "+MasonUpdate" "+TSUpdateSync" +qa; then
+	if ! nvim --headless "+set nomore" "+Lazy! sync" "+MasonUpdate" "+TSUpdateSync" +qa; then
 		fail "Neovim plugin bootstrap failed."
 	fi
 }
@@ -675,6 +613,7 @@ brew_formulae=(
 	helm
 	gettext
 	jpeg
+	k9s
 	libtool
 	libpng
 	librsvg
@@ -727,36 +666,6 @@ else
 	run_step "Clone fzf-git" git clone https://github.com/junegunn/fzf-git.sh.git "$HOME/.fzf-git"
 fi
 
-log "Ensuring GitHub CLI configuration"
-if command_exists gh; then
-	if ! gh auth status >/dev/null 2>&1; then
-		log "GitHub CLI is installed but not authenticated. Launching authentication flow..."
-		if ! gh auth login --web -h github.com; then
-			log "GitHub CLI authentication skipped or failed. Continuing without it."
-		fi
-	fi
-	run_step "Upgrade GitHub CLI extensions" gh_extension_upgrade_all
-else
-	log "GitHub CLI not found; skipping GitHub-specific configuration."
-fi
-
-log "Ensuring 1Password CLI configuration"
-if command_exists op; then
-	if op whoami >/dev/null 2>&1; then
-		log "1Password CLI already signed in; skipping signin."
-	else
-		log "1Password CLI is installed but not authenticated. Launching signin flow..."
-		if eval "$(op signin)"; then
-			log "1Password CLI signin completed."
-		else
-			log "1Password CLI signin skipped or failed. Continuing without it."
-		fi
-	fi
-else
-	log "1Password CLI not found; skipping 1Password-specific configuration."
-fi
-
-run_step "Generate environment files from 1Password" bootstrap_env_from_1password
 run_step "Configure 1Password SSH agent bridges" configure_1password_ssh_agent
 
 log "Configuring mise runtimes"

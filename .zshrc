@@ -175,6 +175,50 @@ setup_1password_ssh_agent() {
 }
 setup_1password_ssh_agent
 
+dotfiles_auth_bootstrap() {
+	# Skip when not attached to an interactive TTY.
+	if [[ ! -t 0 || ! -t 1 ]]; then
+		return
+	fi
+
+	local env_script="$HOME/.dotfiles/bootstrap-env-from-1password"
+
+	if command -v op >/dev/null 2>&1; then
+		if ! op whoami >/dev/null 2>&1; then
+			echo "1Password CLI is not signed in. Launching 'op signin'..."
+			if op signin; then
+				echo "1Password CLI signin completed."
+			else
+				echo "1Password CLI signin skipped or failed."
+			fi
+		fi
+
+		if op whoami >/dev/null 2>&1 && [[ -x "$env_script" ]]; then
+			"$env_script" --quiet
+		fi
+	else
+		echo "1Password CLI not found; skipping secret bootstrap."
+	fi
+
+	if command -v gh >/dev/null 2>&1; then
+		if ! gh auth status >/dev/null 2>&1; then
+			echo "GitHub CLI is not authenticated. Launching 'gh auth login --web'..."
+			if gh auth login --web -h github.com; then
+				echo "GitHub CLI login completed."
+			else
+				echo "GitHub CLI login skipped or failed."
+			fi
+		fi
+	else
+		echo "GitHub CLI not found; skipping GitHub authentication."
+	fi
+}
+
+if [[ $- == *i* && -z "${DOTFILES_AUTH_BOOTSTRAP_DONE:-}" ]]; then
+	export DOTFILES_AUTH_BOOTSTRAP_DONE=1
+	dotfiles_auth_bootstrap
+fi
+
 # Set personal aliases.
 alias cat="bat --paging=never"
 alias help="run-help"

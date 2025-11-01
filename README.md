@@ -77,7 +77,7 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (91)
+### Neovim Plugins (93)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
@@ -100,6 +100,7 @@ to run my full Neovim setup and nothing extra.
 - [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim.git)
 - [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim.git)
 - [gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim.git)
+- [helm-ls.nvim](https://github.com/qvalentin/helm-ls.nvim.git)
 - [hererocks](https://github.com/luarocks/hererocks.git)
 - [inc-rename.nvim](https://github.com/smjonas/inc-rename.nvim.git)
 - [kulala.nvim](https://github.com/mistweaverco/kulala.nvim.git)
@@ -117,6 +118,8 @@ to run my full Neovim setup and nothing extra.
 - [neotest](https://github.com/nvim-neotest/neotest.git)
 - [neotest-elixir](https://github.com/jfpedroza/neotest-elixir.git)
 - [neotest-golang](https://github.com/fredrikaverpil/neotest-golang.git)
+- [neotest-pest](https://github.com/V13Axel/neotest-pest.git)
+- [neotest-phpunit](https://github.com/olimorris/neotest-phpunit.git)
 - [neotest-playwright](https://github.com/thenbe/neotest-playwright.git)
 - [neotest-plenary](https://github.com/nvim-neotest/neotest-plenary.git)
 - [neotest-python](https://github.com/nvim-neotest/neotest-python.git)
@@ -165,7 +168,6 @@ to run my full Neovim setup and nothing extra.
 - [vim-dadbod](https://github.com/tpope/vim-dadbod.git)
 - [vim-dadbod-completion](https://github.com/kristijanhusak/vim-dadbod-completion.git)
 - [vim-dadbod-ui](https://github.com/kristijanhusak/vim-dadbod-ui.git)
-- [vim-helm](https://github.com/towolf/vim-helm.git)
 - [vim-visual-multi](https://github.com/mg979/vim-visual-multi.git)
 - [which-key.nvim](https://github.com/folke/which-key.nvim.git)
 - [window-picker](https://github.com/s1n7ax/nvim-window-picker.git)

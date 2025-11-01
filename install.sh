@@ -626,7 +626,6 @@ brew_formulae=(
 	ripgrep
 	rust-analyzer
 	tlrc
-	wezterm
 	wordnet
 	pango
 	zoxide
@@ -641,6 +640,7 @@ fi
 
 if [[ "$platform" == "ubuntu" ]]; then
 	brew_formulae+=(
+		"wez/wezterm-linuxbrew/wezterm"
 		glew
 		libxext
 		libxi
@@ -654,6 +654,7 @@ fi
 run_step "Install brew packages" brew install "${brew_formulae[@]}"
 
 if [[ "$platform" == "macos" ]]; then
+	run_step "Install WezTerm (cask)" brew install --cask wezterm
 	run_step "Install 1Password CLI (cask)" brew install --cask 1password-cli
 fi
 
@@ -686,6 +687,9 @@ for tool in "${mise_globals[@]}"; do
 done
 
 run_step "Install/upgrade mise runtimes" mise_install_all
+
+# Ensure PROMPT_COMMAND exists before mise injects hook while set -u is active.
+: "${PROMPT_COMMAND:=}"
 
 eval "$(mise activate bash)"
 

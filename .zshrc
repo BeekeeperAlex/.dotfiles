@@ -186,7 +186,7 @@ dotfiles_auth_bootstrap() {
 	if command -v op >/dev/null 2>&1; then
 		if ! op whoami >/dev/null 2>&1; then
 			echo "1Password CLI is not signed in. Launching 'op signin'..."
-			if op signin; then
+			if eval $(op signin); then
 				echo "1Password CLI signin completed."
 			else
 				echo "1Password CLI signin skipped or failed."

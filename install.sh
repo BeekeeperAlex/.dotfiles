@@ -679,7 +679,7 @@ mise_globals=(
 	bun@latest
 	lua@latest
 	python@latest
-	rust@stable
+	rust@latest
 )
 
 for tool in "${mise_globals[@]}"; do

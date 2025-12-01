@@ -40,14 +40,14 @@ config.default_cursor_style = "BlinkingBlock"
 config.enable_scroll_bar = false
 -- config.enable_wayland = true
 config.exit_behavior_messaging = "Verbose"
--- config.front_end = "OpenGL" -- ["OpenGL", "Software", "WebGpu"]
+config.front_end = "WebGpu" -- ["OpenGL", "Software", "WebGpu"]
 config.hide_mouse_cursor_when_typing = true
 config.hide_tab_bar_if_only_one_tab = false
 -- config.macos_window_background_blur = 0
-config.max_fps = 144
+config.max_fps = 240
 config.mouse_wheel_scrolls_tabs = false
 config.native_macos_fullscreen_mode = true
-config.scrollback_lines = 100000
+config.scrollback_lines = 10000
 config.show_tab_index_in_tab_bar = true
 config.tab_bar_at_bottom = false
 -- config.term = "wezterm"
@@ -101,7 +101,10 @@ if wezterm.target_triple:match("windows") then
 			end
 		end
 	end
-	wallpaper_path = string.format("\\\\wsl.localhost\\%s\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\", wallpaper_distro or "Ubuntu")
+	wallpaper_path = string.format(
+		"\\\\wsl.localhost\\%s\\home\\chev\\.dotfiles\\images\\wezterm-wallpapers\\",
+		wallpaper_distro or "Ubuntu"
+	)
 	-- config.default_prog = { "wsl.exe" }
 	config.win32_system_backdrop = "Disable" -- ["Auto", "Acrylic", "Mica", "Tabbed" "Disable"]
 elseif wezterm.target_triple:match("darwin") then
@@ -119,31 +122,31 @@ local function get_random_wallpaper()
 end
 
 -- if wallpaper then
-config.background = {
-	{
-		source = {
-			-- File = wallpaper_path .. "svgmeadow.png",
-			File = get_random_wallpaper(),
-		},
-		opacity = 1,
-		attachment = "Fixed",
-		repeat_x = "NoRepeat",
-		repeat_y = "NoRepeat",
-		vertical_align = "Bottom",
-		horizontal_align = "Center",
-		height = "Cover",
-		width = "Cover",
-	},
-	{
-		source = {
-			-- Color = "#000000",
-			Color = color_schemes[config.color_scheme].background,
-		},
-		opacity = 0.9,
-		width = "100%",
-		height = "100%",
-	},
-}
+-- config.background = {
+-- 	{
+-- 		source = {
+-- 			-- File = wallpaper_path .. "svgmeadow.png",
+-- 			File = get_random_wallpaper(),
+-- 		},
+-- 		opacity = 1,
+-- 		attachment = "Fixed",
+-- 		repeat_x = "NoRepeat",
+-- 		repeat_y = "NoRepeat",
+-- 		vertical_align = "Bottom",
+-- 		horizontal_align = "Center",
+-- 		height = "Cover",
+-- 		width = "Cover",
+-- 	},
+-- 	{
+-- 		source = {
+-- 			-- Color = "#000000",
+-- 			Color = color_schemes[config.color_scheme].background,
+-- 		},
+-- 		opacity = 0.9,
+-- 		width = "100%",
+-- 		height = "100%",
+-- 	},
+-- }
 -- end
 
 return config

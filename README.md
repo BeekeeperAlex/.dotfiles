@@ -77,7 +77,7 @@ to run my full Neovim setup and nothing extra.
 - [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 - [LazyVim/starter](https://github.com/LazyVim/starter)
 
-### Neovim Plugins (93)
+### Neovim Plugins (92)
 
 - [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim.git)
 - [FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim.git)
@@ -101,7 +101,6 @@ to run my full Neovim setup and nothing extra.
 - [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim.git)
 - [gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim.git)
 - [helm-ls.nvim](https://github.com/qvalentin/helm-ls.nvim.git)
-- [hererocks](https://github.com/luarocks/hererocks.git)
 - [inc-rename.nvim](https://github.com/smjonas/inc-rename.nvim.git)
 - [kulala.nvim](https://github.com/mistweaverco/kulala.nvim.git)
 - [lazydev.nvim](https://github.com/folke/lazydev.nvim.git)
